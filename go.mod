@@ -1,4 +1,4 @@
-module github.com/Ubivius/microservice-template
+module github.com/Ubivius/microservice-text-chat
 
 go 1.15
 

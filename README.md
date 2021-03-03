@@ -1,7 +1,5 @@
 # microservice-template
-Template for microservices.
-
-This template can be used to create another microservice without having to write any of the boilerplate code.
+Text chat microservice for our online game framework.
 
 **Launch local ElasticSearch**
 ----

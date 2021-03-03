@@ -3,13 +3,13 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/Ubivius/microservice-template/data"
+	"github.com/Ubivius/microservice-text-chat/data"
 )
 
-// AddProduct creates a new product from the received JSON
-func (productHandler *ProductsHandler) AddProduct(responseWriter http.ResponseWriter, request *http.Request) {
-	productHandler.logger.Println("Handle POST Product")
-	product := request.Context().Value(KeyProduct{}).(*data.Product)
+// AddMessage creates a new message from the received JSON
+func (textChatJandler *TextChatHandler) AddMessage(responseWriter http.ResponseWriter, request *http.Request) {
+	textChatJandler.logger.Println("Handle POST Message")
+	message := request.Context().Value(KeyMessage{}).(*data.Message)
 
-	data.AddProduct(product)
+	data.AddMessage(message)
 }

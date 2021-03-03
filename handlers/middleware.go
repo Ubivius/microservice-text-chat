@@ -5,35 +5,35 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Ubivius/microservice-template/data"
+	"github.com/Ubivius/microservice-text-chat/data"
 )
 
 // Errors should be templated in the future.
-// A good starting reference can be found here : https://github.com/nicholasjackson/building-microservices-youtube/blob/episode_7/product-api/handlers/middleware.go
+// A good starting reference can be found here : https://github.com/nicholasjackson/building-microservices-youtube/blob/episode_7/message-api/handlers/middleware.go
 // We want our validation errors to have a standard format
 
-// MiddlewareProductValidation is used to validate incoming product JSONS
-func (productHandler *ProductsHandler) MiddlewareProductValidation(next http.Handler) http.Handler {
+// MiddlewareMessageValidation is used to validate incoming message JSONS
+func (textChatJandler *TextChatHandler) MiddlewareMessageValidation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
-		product := &data.Product{}
+		message := &data.Message{}
 
-		err := data.FromJSON(product, request.Body)
+		err := data.FromJSON(message, request.Body)
 		if err != nil {
-			productHandler.logger.Println("[ERROR] deserializing product", err)
-			http.Error(responseWriter, "Error reading product", http.StatusBadRequest)
+			textChatJandler.logger.Println("[ERROR] deserializing message", err)
+			http.Error(responseWriter, "Error reading message", http.StatusBadRequest)
 			return
 		}
 
-		// validate the product
-		err = product.ValidateProduct()
+		// validate the message
+		err = message.ValidateMessage()
 		if err != nil {
-			productHandler.logger.Println("[ERROR] validating product", err)
-			http.Error(responseWriter, fmt.Sprintf("Error validating product: %s", err), http.StatusBadRequest)
+			textChatJandler.logger.Println("[ERROR] validating message", err)
+			http.Error(responseWriter, fmt.Sprintf("Error validating message: %s", err), http.StatusBadRequest)
 			return
 		}
 
-		// Add the product to the context
-		ctx := context.WithValue(request.Context(), KeyProduct{}, product)
+		// Add the message to the context
+		ctx := context.WithValue(request.Context(), KeyMessage{}, message)
 		newRequest := request.WithContext(ctx)
 
 		// Call the next handler, which can be another middleware or the final handler

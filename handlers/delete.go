@@ -3,24 +3,47 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/Ubivius/microservice-template/data"
+	"github.com/Ubivius/microservice-text-chat/data"
 )
 
-// Delete a product with specified id from the database
-func (productHandler *ProductsHandler) Delete(responseWriter http.ResponseWriter, request *http.Request) {
-	id := getProductID(request)
-	productHandler.logger.Println("Handle DELETE product", id)
+// Delete a message with specified id from the database
+func (textChatJandler *TextChatHandler) DeleteMessage(responseWriter http.ResponseWriter, request *http.Request) {
+	id := getTextChatID(request)
+	textChatJandler.logger.Println("Handle DELETE message", id)
 
-	err := data.DeleteProduct(id)
-	if err == data.ErrorProductNotFound {
-		productHandler.logger.Println("[ERROR] deleting, id does not exist")
-		http.Error(responseWriter, "Product not found", http.StatusNotFound)
+	err := data.DeleteMessage(id)
+	if err == data.ErrorMessageNotFound {
+		textChatJandler.logger.Println("[ERROR] deleting, id does not exist")
+		http.Error(responseWriter, "Message not found", http.StatusNotFound)
 		return
 	}
 
 	if err != nil {
-		productHandler.logger.Println("[ERROR] deleting product", err)
-		http.Error(responseWriter, "Erro deleting poduct", http.StatusInternalServerError)
+		textChatJandler.logger.Println("[ERROR] deleting message", err)
+		http.Error(responseWriter, "Erro deleting message", http.StatusInternalServerError)
+		return
+	}
+
+	responseWriter.WriteHeader(http.StatusNoContent)
+}
+
+// Delete a message with specified id from the database
+func (textChatJandler *TextChatHandler) DeleteConversation(responseWriter http.ResponseWriter, request *http.Request) {
+	id := getTextChatID(request)
+	textChatJandler.logger.Println("Handle DELETE conversation", id)
+
+	// Delete de tous les messages de la conversation
+
+	err := data.DeleteConversation(id)
+	if err == data.ErrorConversationNotFound {
+		textChatJandler.logger.Println("[ERROR] deleting, id does not exist")
+		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		textChatJandler.logger.Println("[ERROR] deleting conversation", err)
+		http.Error(responseWriter, "Error deleting conversation", http.StatusInternalServerError)
 		return
 	}
 
