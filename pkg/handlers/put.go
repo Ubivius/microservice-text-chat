@@ -3,18 +3,18 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/Ubivius/microservice-text-chat/data"
+	"github.com/Ubivius/microservice-text-chat/pkg/data"
 )
 
 // UpdateMessages updates the message with the ID specified in the received JSON message
-func (textChatJandler *TextChatHandler) UpdateMessages(responseWriter http.ResponseWriter, request *http.Request) {
+func (textChatHandler *TextChatHandler) UpdateMessage(responseWriter http.ResponseWriter, request *http.Request) {
 	message := request.Context().Value(KeyMessage{}).(data.Message)
-	textChatJandler.logger.Println("Handle PUT message", message.ID)
+	textChatHandler.logger.Println("Handle PUT message", message.ID)
 
 	// Update message
 	err := data.UpdateMessage(&message)
 	if err == data.ErrorMessageNotFound {
-		textChatJandler.logger.Println("[ERROR} message not found", err)
+		textChatHandler.logger.Println("[ERROR} message not found", err)
 		http.Error(responseWriter, "Message not found", http.StatusNotFound)
 		return
 	}

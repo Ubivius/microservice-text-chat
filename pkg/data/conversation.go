@@ -38,18 +38,6 @@ func GetConversationByID(id int) (*Conversation, error) {
 	return conversationList[index], nil
 }
 
-// UPDATING PRODUCTS
-
-// UpdateConversation updates the conversation specified in received JSON
-func UpdateConversation(conversation *Conversation) error {
-	index := findIndexByConversationID(conversation.ID)
-	if index == -1 {
-		return ErrorConversationNotFound
-	}
-	conversationList[index] = conversation
-	return nil
-}
-
 // AddConversation creates a new conversation
 func AddConversation(conversation *Conversation) {
 	conversation.ID = getNextID()

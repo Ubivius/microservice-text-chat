@@ -102,7 +102,7 @@ func findIndexByMessageID(id int) int {
 ///////////////////////////////////////////////////////////////////////////
 
 // Finds the maximum index of our fake database and adds 1
-func getNextID() int {
+func getNextMessageID() int {
 	lastMessage := messageList[len(messageList)-1]
 	return lastMessage.ID + 1
 }

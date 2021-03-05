@@ -10,6 +10,8 @@ import (
 
 // KeyMessage is a key used for the Message object inside context
 type KeyMessage struct{}
+
+// KeyConversation is a key used for the Message object inside context
 type KeyConversation struct{}
 
 type TextChatHandler struct {
@@ -20,7 +22,7 @@ func NewTextChatHandler(logger *log.Logger) *TextChatHandler {
 	return &TextChatHandler{logger}
 }
 
-// getMessageID extracts the message ID from the URL
+// getTextChatID extracts the conversation/message ID from the URL
 // The verification of this variable is handled by gorilla/mux
 // We panic if it is not valid because that means gorilla is failing
 func getTextChatID(request *http.Request) int {
