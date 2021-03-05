@@ -224,30 +224,6 @@ func TestAddConversation(t *testing.T) {
 	}
 }
 
-func TestUpdateMessage(t *testing.T) {
-	// Creating request body
-	body := &data.Message{
-		ID:             1,
-		UserID:         1,
-		ConversationID: 1,
-		Text:           "This is a modified test message",
-	}
-
-	request := httptest.NewRequest(http.MethodPut, "/messages", nil)
-	response := httptest.NewRecorder()
-
-	// Add the body to the context since we arent passing through middleware
-	ctx := context.WithValue(request.Context(), KeyMessage{}, body)
-	request = request.WithContext(ctx)
-
-	textChatHandler := NewTextChatHandler(NewTestLogger())
-	textChatHandler.UpdateMessage(response, request)
-
-	if response.Code != http.StatusNoContent {
-		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, response.Code)
-	}
-}
-
 func TestDeleteExistingMessage(t *testing.T) {
 	request := httptest.NewRequest(http.MethodDelete, "/messages/1", nil)
 	response := httptest.NewRecorder()
