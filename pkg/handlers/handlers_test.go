@@ -204,7 +204,6 @@ func TestAddMessage(t *testing.T) {
 func TestAddConversation(t *testing.T) {
 	// Creating request body
 	body := &data.Conversation{
-		ID:     1,
 		UserID: []int{1, 3},
 		GameID: -1,
 	}

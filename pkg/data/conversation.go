@@ -24,6 +24,11 @@ type Conversations []*Conversation
 // All of these functions will become database calls in the future
 // GETTING PRODUCTS
 
+func GetConversationID(userid []int) int {
+	lastConversation := conversationList[len(conversationList)-1]
+	return lastConversation.ID + 1
+}
+
 // GetConversations returns the list of conversations
 func GetConversations() Conversations {
 	return conversationList
@@ -32,7 +37,7 @@ func GetConversations() Conversations {
 // GetConversationByID returns a single conversation with the given id
 func GetConversationByID(id int) (*Conversation, error) {
 	index := findIndexByConversationID(id)
-	if id == -1 {
+	if index == -1 {
 		return nil, ErrorConversationNotFound
 	}
 	return conversationList[index], nil
@@ -40,7 +45,7 @@ func GetConversationByID(id int) (*Conversation, error) {
 
 // AddConversation creates a new conversation
 func AddConversation(conversation *Conversation) {
-	conversation.ID = getNextID()
+	conversation.ID = getNextConversationID()
 	conversationList = append(conversationList, conversation)
 }
 
@@ -74,7 +79,7 @@ func findIndexByConversationID(id int) int {
 ///////////////////////////////////////////////////////////////////////////
 
 // Finds the maximum index of our fake database and adds 1
-func getNextID() int {
+func getNextConversationID() int {
 	lastConversation := conversationList[len(conversationList)-1]
 	return lastConversation.ID + 1
 }
@@ -91,6 +96,13 @@ var conversationList = []*Conversation{
 	},
 	{
 		ID:        2,
+		UserID:    []int{1, 3, 4, 5},
+		GameID:    1,
+		CreatedOn: time.Now().UTC().String(),
+		UpdatedOn: time.Now().UTC().String(),
+	},
+	{
+		ID:        12,
 		UserID:    []int{1, 3, 4, 5},
 		GameID:    1,
 		CreatedOn: time.Now().UTC().String(),

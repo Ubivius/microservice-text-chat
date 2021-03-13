@@ -12,9 +12,9 @@ var ErrorMessageNotFound = fmt.Errorf("Message not found")
 // Formatting done with json tags to the right. "-" : don't include when encoding to json
 type Message struct {
 	ID             int    `json:"id"`
-	UserID         int    `json:"userid"`
-	ConversationID int    `json:"conversationid"`
-	Text           string `json:"message" validate:"required"`
+	UserID         int    `json:"userid" validate:"isuser"`
+	ConversationID int    `json:"conversationid" validate:"isconversation"`
+	Text           string `json:"text" validate:"required"`
 	CreatedOn      string `json:"-"`
 	UpdatedOn      string `json:"-"`
 	DeletedOn      string `json:"-"`
@@ -68,7 +68,7 @@ func UpdateMessage(message *Message) error {
 
 // AddMessage creates a new message
 func AddMessage(message *Message) {
-	message.ID = getNextID()
+	message.ID = getNextMessageID()
 	messageList = append(messageList, message)
 }
 
