@@ -109,8 +109,8 @@ func TestGetNonExistingMessageByID(t *testing.T) {
 	if response.Code != http.StatusBadRequest {
 		t.Errorf("Expected status code %d but got : %d", http.StatusBadRequest, response.Code)
 	}
-	if !strings.Contains(response.Body.String(), "Product not found") {
-		t.Error("Expected response : Product not found")
+	if !strings.Contains(response.Body.String(), "Message not found") {
+		t.Error("Expected response : Message not found")
 	}
 }
 
@@ -131,8 +131,8 @@ func TestGetNonExistingConversationByID(t *testing.T) {
 	if response.Code != http.StatusBadRequest {
 		t.Errorf("Expected status code %d but got : %d", http.StatusBadRequest, response.Code)
 	}
-	if !strings.Contains(response.Body.String(), "Product not found") {
-		t.Error("Expected response : Product not found")
+	if !strings.Contains(response.Body.String(), "Conversation not found") {
+		t.Error("Expected response : Conversation not found")
 	}
 }
 
@@ -152,8 +152,8 @@ func TestDeleteNonExistantMessage(t *testing.T) {
 	if response.Code != http.StatusNotFound {
 		t.Errorf("Expected status code %d but got : %d", http.StatusNotFound, response.Code)
 	}
-	if !strings.Contains(response.Body.String(), "Product not found") {
-		t.Error("Expected response : Product not found")
+	if !strings.Contains(response.Body.String(), "Message not found") {
+		t.Error("Expected response : Message not found")
 	}
 }
 
@@ -173,8 +173,8 @@ func TestDeleteNonExistantConversation(t *testing.T) {
 	if response.Code != http.StatusNotFound {
 		t.Errorf("Expected status code %d but got : %d", http.StatusNotFound, response.Code)
 	}
-	if !strings.Contains(response.Body.String(), "Product not found") {
-		t.Error("Expected response : Product not found")
+	if !strings.Contains(response.Body.String(), "Conversation not found") {
+		t.Error("Expected response : Conversation not found")
 	}
 }
 
