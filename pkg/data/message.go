@@ -24,7 +24,6 @@ type Message struct {
 type Messages []*Message
 
 // All of these functions will become database calls in the future
-// GETTING PRODUCTS
 
 // GetMessages returns the list of messages
 func GetMessages() Messages {
@@ -34,7 +33,7 @@ func GetMessages() Messages {
 // GetMessageByID returns a single message with the given id
 func GetMessageByID(id int) (*Message, error) {
 	index := findIndexByMessageID(id)
-	if id == -1 {
+	if index == -1 {
 		return nil, ErrorMessageNotFound
 	}
 	return messageList[index], nil

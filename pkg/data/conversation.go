@@ -12,8 +12,8 @@ var ErrorConversationNotFound = fmt.Errorf("Conversation not found")
 // Formatting done with json tags to the right. "-" : don't include when encoding to json
 type Conversation struct {
 	ID        int    `json:"id"`
-	UserID    []int  `json:"userid"`
-	GameID    int    `json:"gameid"`
+	UserID    []int  `json:"userid" validate:"isuser"`
+	GameID    int    `json:"gameid" validate:"isgame"`
 	CreatedOn string `json:"-"`
 	UpdatedOn string `json:"-"`
 }
@@ -22,7 +22,6 @@ type Conversation struct {
 type Conversations []*Conversation
 
 // All of these functions will become database calls in the future
-// GETTING PRODUCTS
 
 func GetConversationID(userid []int) int {
 	lastConversation := conversationList[len(conversationList)-1]
