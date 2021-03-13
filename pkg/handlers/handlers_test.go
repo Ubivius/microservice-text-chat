@@ -137,7 +137,7 @@ func TestGetNonExistingConversationByID(t *testing.T) {
 }
 
 func TestDeleteNonExistantMessage(t *testing.T) {
-	request := httptest.NewRequest(http.MethodDelete, "/products/4", nil)
+	request := httptest.NewRequest(http.MethodDelete, "/messages/4", nil)
 	response := httptest.NewRecorder()
 
 	textChatHandler := NewTextChatHandler(NewTestLogger())
@@ -169,7 +169,7 @@ func TestDeleteNonExistingConversation(t *testing.T) {
 	}
 	request = mux.SetURLVars(request, vars)
 
-	textChatHandler.DeleteMessage(response, request)
+	textChatHandler.DeleteConversation(response, request)
 	if response.Code != http.StatusNotFound {
 		t.Errorf("Expected status code %d but got : %d", http.StatusNotFound, response.Code)
 	}
