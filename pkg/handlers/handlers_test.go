@@ -157,7 +157,7 @@ func TestDeleteNonExistantMessage(t *testing.T) {
 	}
 }
 
-func TestDeleteNonExistantConversation(t *testing.T) {
+func TestDeleteNonExistingConversation(t *testing.T) {
 	request := httptest.NewRequest(http.MethodDelete, "/conversations/4", nil)
 	response := httptest.NewRecorder()
 

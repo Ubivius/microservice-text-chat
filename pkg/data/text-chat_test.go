@@ -4,7 +4,9 @@ import "testing"
 
 func TestChecksValidation(t *testing.T) {
 	message := &Message{
-		Text: "This is a text message",
+		ConversationID: 1,
+		UserID:         1,
+		Text:           "This is a text message",
 	}
 
 	err := message.ValidateMessage()
@@ -12,7 +14,10 @@ func TestChecksValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	conversation := &Conversation{}
+	conversation := &Conversation{
+		UserID: []int{1, 2},
+		GameID: -1,
+	}
 
 	err = conversation.ValidateConversation()
 	if err != nil {
