@@ -25,12 +25,14 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 		ConversationID: 1,
 		Text:           "This is a test message",
 	}
-	messageBodyBytes, _ := json.Marshal(messageBody)
-	conversationBodyBytes, _ := json.Marshal(conversationBody)
 
-	messageRequest := httptest.NewRequest(http.MethodPost, "/messages", strings.NewReader(string(messageBodyBytes)))
+	conversationBodyBytes, _ := json.Marshal(conversationBody)
 	conversationRequest := httptest.NewRequest(http.MethodPost, "/conversations", strings.NewReader(string(conversationBodyBytes)))
-	response := httptest.NewRecorder()
+	conversationResponse := httptest.NewRecorder()
+
+	messageBodyBytes, _ := json.Marshal(messageBody)
+	messageRequest := httptest.NewRequest(http.MethodPost, "/messages", strings.NewReader(string(messageBodyBytes)))
+	messageResponse := httptest.NewRecorder()
 
 	textChatHandler := NewTextChatHandler(NewTestLogger())
 
@@ -41,11 +43,11 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	router.Use(textChatHandler.MiddlewareMessageValidation)
 
 	// Server http on our router
-	router.ServeHTTP(response, conversationRequest)
-	router.ServeHTTP(response, messageRequest)
+	router.ServeHTTP(conversationResponse, conversationRequest)
+	router.ServeHTTP(messageResponse, messageRequest)
 
-	if response.Code != http.StatusNoContent {
-		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, response.Code)
+	if messageResponse.Code != http.StatusNoContent {
+		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, messageResponse.Code)
 	}
 }
 
