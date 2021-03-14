@@ -212,7 +212,7 @@ func TestAddConversation(t *testing.T) {
 	response := httptest.NewRecorder()
 
 	// Add the body to the context since we arent passing through middleware
-	ctx := context.WithValue(request.Context(), KeyMessage{}, body)
+	ctx := context.WithValue(request.Context(), KeyConversation{}, body)
 	request = request.WithContext(ctx)
 
 	textChatHandler := NewTextChatHandler(NewTestLogger())
