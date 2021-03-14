@@ -16,6 +16,7 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 	responseWriter.WriteHeader(http.StatusNoContent)
 }
 
+// AddConversation creates a new message from the received JSON
 func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.ResponseWriter, request *http.Request) {
 	textChatHandler.logger.Println("Handle POST Conversation")
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)

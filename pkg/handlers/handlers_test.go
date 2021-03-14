@@ -216,7 +216,7 @@ func TestAddConversation(t *testing.T) {
 	request = request.WithContext(ctx)
 
 	textChatHandler := NewTextChatHandler(NewTestLogger())
-	textChatHandler.AddMessage(response, request)
+	textChatHandler.AddConversation(response, request)
 
 	if response.Code != http.StatusNoContent {
 		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, response.Code)
