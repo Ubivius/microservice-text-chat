@@ -13,15 +13,23 @@ import (
 
 func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	// Creating request body
-	body := &data.Message{
+	conversationBody := &data.Conversation{
+		ID:     1,
+		UserID: []int{1, 3},
+		GameID: -1,
+	}
+
+	messageBody := &data.Message{
 		ID:             1,
 		UserID:         1,
 		ConversationID: 1,
 		Text:           "This is a test message",
 	}
-	bodyBytes, _ := json.Marshal(body)
+	messageBodyBytes, _ := json.Marshal(messageBody)
+	conversationBodyBytes, _ := json.Marshal(conversationBody)
 
-	request := httptest.NewRequest(http.MethodPost, "/messages", strings.NewReader(string(bodyBytes)))
+	messageRequest := httptest.NewRequest(http.MethodPost, "/messages", strings.NewReader(string(messageBodyBytes)))
+	conversationRequest := httptest.NewRequest(http.MethodPost, "/conversations", strings.NewReader(string(conversationBodyBytes)))
 	response := httptest.NewRecorder()
 
 	textChatHandler := NewTextChatHandler(NewTestLogger())
@@ -29,10 +37,12 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	// Create a router for middleware because function attachment is handled by gorilla/mux
 	router := mux.NewRouter()
 	router.HandleFunc("/messages", textChatHandler.AddMessage)
+	router.HandleFunc("/conversations", textChatHandler.AddConversation)
 	router.Use(textChatHandler.MiddlewareMessageValidation)
 
 	// Server http on our router
-	router.ServeHTTP(response, request)
+	router.ServeHTTP(response, conversationRequest)
+	router.ServeHTTP(response, messageRequest)
 
 	if response.Code != http.StatusNoContent {
 		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, response.Code)
