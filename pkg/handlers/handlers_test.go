@@ -253,7 +253,7 @@ func TestDeleteExistingConversation(t *testing.T) {
 	}
 	request = mux.SetURLVars(request, vars)
 
-	textChatHandler.DeleteMessage(response, request)
+	textChatHandler.DeleteConversation(response, request)
 	if response.Code != http.StatusNoContent {
 		t.Errorf("Expected status code %d but got : %d", http.StatusNoContent, response.Code)
 	}
