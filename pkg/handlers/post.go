@@ -12,6 +12,8 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 	message := request.Context().Value(KeyMessage{}).(*data.Message)
 
 	data.AddMessage(message)
+
+	responseWriter.WriteHeader(http.StatusNoContent)
 }
 
 func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.ResponseWriter, request *http.Request) {
@@ -19,4 +21,6 @@ func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.Resp
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)
 
 	data.AddConversation(conversation)
+
+	responseWriter.WriteHeader(http.StatusNoContent)
 }
