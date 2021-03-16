@@ -38,13 +38,18 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 
 	// Create a router for middleware because function attachment is handled by gorilla/mux
 	router := mux.NewRouter()
-	router.HandleFunc("/messages", textChatHandler.AddMessage)
-	router.HandleFunc("/conversations", textChatHandler.AddConversation)
-	router.Use(textChatHandler.MiddlewareMessageValidation)
+
+	conversationPostRouter := router.Methods(http.MethodPost).Subrouter()
+	conversationPostRouter.HandleFunc("/conversations", textChatHandler.AddConversation)
+	conversationPostRouter.Use(textChatHandler.MiddlewareConversationValidation)
+
+	messagePostRouter := router.Methods(http.MethodPost).Subrouter()
+	messagePostRouter.HandleFunc("/messages", textChatHandler.AddMessage)
+	messagePostRouter.Use(textChatHandler.MiddlewareMessageValidation)
 
 	// Server http on our router
-	router.ServeHTTP(conversationResponse, conversationRequest)
-	router.ServeHTTP(messageResponse, messageRequest)
+	conversationPostRouter.ServeHTTP(conversationResponse, conversationRequest)
+	messagePostRouter.ServeHTTP(messageResponse, messageRequest)
 
 	if messageResponse.Code != http.StatusNoContent {
 		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, messageResponse.Code)
