@@ -20,11 +20,15 @@ func New(textChatHandler *handlers.TextChatHandler, logger *log.Logger) *mux.Rou
 	getRouter.HandleFunc("/conversations/{id:[0-9]+}", textChatHandler.GetConversationByID)
 	getRouter.HandleFunc("/messages/conversation/{id:[0-9]+}", textChatHandler.GetMessagesByConversationID)
 
-	// Post router
-	postRouter := router.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/messages", textChatHandler.AddMessage)
-	postRouter.HandleFunc("/conversations", textChatHandler.AddConversation)
-	postRouter.Use(textChatHandler.MiddlewareMessageValidation)
+	// Message post router
+	messagePostRouter := router.Methods(http.MethodPost).Subrouter()
+	messagePostRouter.HandleFunc("/messages", textChatHandler.AddMessage)
+	messagePostRouter.Use(textChatHandler.MiddlewareMessageValidation)
+
+	// Conversation post router
+	conversationPostRouter := router.Methods(http.MethodPost).Subrouter()
+	conversationPostRouter.HandleFunc("/conversations", textChatHandler.AddConversation)
+	conversationPostRouter.Use(textChatHandler.MiddlewareConversationValidation)
 
 	// Delete router
 	deleteRouter := router.Methods(http.MethodDelete).Subrouter()

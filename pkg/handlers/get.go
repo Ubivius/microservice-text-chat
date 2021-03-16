@@ -19,7 +19,7 @@ func (textChatHandler *TextChatHandler) GetMessages(responseWriter http.Response
 
 func (textChatHandler *TextChatHandler) GetConversations(responseWriter http.ResponseWriter, request *http.Request) {
 	textChatHandler.logger.Println("Handle GET conversation")
-	conversationList := data.GetMessages()
+	conversationList := data.GetConversations()
 	err := json.NewEncoder(responseWriter).Encode(conversationList)
 	if err != nil {
 		textChatHandler.logger.Println("[ERROR] serializing conversation", err)
