@@ -219,8 +219,8 @@ func TestAddMessageNonExistingConversation(t *testing.T) {
 	textChatHandler := NewTextChatHandler(NewTestLogger())
 	textChatHandler.AddMessage(response, request)
 
-	if response.Code != http.StatusNoContent {
-		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, response.Code)
+	if response.Code != http.StatusNotFound {
+		t.Errorf("Expected status code %d, but got %d", http.StatusNotFound, response.Code)
 	}
 }
 
