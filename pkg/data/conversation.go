@@ -12,8 +12,8 @@ var ErrorConversationNotFound = fmt.Errorf("Conversation not found")
 // Formatting done with json tags to the right. "-" : don't include when encoding to json
 type Conversation struct {
 	ID        int    `json:"id"`
-	UserID    []int  `json:"userid" validate:"isuser"`
-	GameID    int    `json:"gameid" validate:"isgame"`
+	UserID    []int  `json:"userid"`
+	GameID    int    `json:"gameid"`
 	CreatedOn string `json:"-"`
 	UpdatedOn string `json:"-"`
 }
@@ -95,13 +95,6 @@ var conversationList = []*Conversation{
 	},
 	{
 		ID:        2,
-		UserID:    []int{1, 3, 4, 5},
-		GameID:    1,
-		CreatedOn: time.Now().UTC().String(),
-		UpdatedOn: time.Now().UTC().String(),
-	},
-	{
-		ID:        12,
 		UserID:    []int{1, 3, 4, 5},
 		GameID:    1,
 		CreatedOn: time.Now().UTC().String(),
