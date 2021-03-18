@@ -44,6 +44,8 @@ func GetConversationByID(id int) (*Conversation, error) {
 
 // AddConversation creates a new conversation
 func AddConversation(conversation *Conversation) {
+	// TODO: Verify if all user exists
+	// TODO: Veryfy if game exist
 	conversation.ID = getNextConversationID()
 	conversationList = append(conversationList, conversation)
 }

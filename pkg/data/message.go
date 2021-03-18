@@ -59,6 +59,9 @@ func AddMessage(message *Message) error {
 	if err != nil {
 		return err
 	}
+
+	// TODO: Verify if user exist
+
 	message.ID = getNextMessageID()
 	messageList = append(messageList, message)
 	return nil

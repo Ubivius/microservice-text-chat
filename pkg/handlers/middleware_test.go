@@ -14,7 +14,6 @@ import (
 func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	// Creating request body
 	body := &data.Message{
-		ID:             1,
 		UserID:         1,
 		ConversationID: 1,
 		Text:           "This is a test message",
@@ -44,7 +43,6 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 func TestValidationMiddlewareWithNoMessage(t *testing.T) {
 	// Creating request body
 	body := &data.Message{
-		ID:             1,
 		UserID:         1,
 		ConversationID: 1,
 	}
