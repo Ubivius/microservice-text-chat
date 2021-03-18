@@ -68,8 +68,8 @@ func TestValidationMiddlewareWithNoMessage(t *testing.T) {
 	// Server http on our router
 	router.ServeHTTP(response, request)
 
-	if response.Code != http.StatusAccepted {
-		t.Errorf("Expected status code %d, but got %d", http.StatusAccepted, response.Code)
+	if response.Code != http.StatusBadRequest {
+		t.Errorf("Expected status code %d, but got %d", http.StatusBadRequest, response.Code)
 	}
 	if !strings.Contains(response.Body.String(), "Field validation for 'Text' failed on the 'required' tag") {
 		t.Error("Expected error on field validation for Text but got : ", response.Body.String())
