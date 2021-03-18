@@ -32,7 +32,7 @@ func (textChatHandler *TextChatHandler) DeleteConversation(responseWriter http.R
 	id := getTextChatID(request)
 	textChatHandler.logger.Println("Handle DELETE conversation", id)
 
-	// Delete de tous les messages de la conversation
+	// TODO: Delete all messages from the conversation
 
 	err := data.DeleteConversation(id)
 	if err == data.ErrorConversationNotFound {

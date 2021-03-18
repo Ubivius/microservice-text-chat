@@ -7,26 +7,6 @@ import (
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
 )
 
-func (textChatHandler *TextChatHandler) GetMessages(responseWriter http.ResponseWriter, request *http.Request) {
-	textChatHandler.logger.Println("Handle GET messages")
-	messageList := data.GetMessages()
-	err := json.NewEncoder(responseWriter).Encode(messageList)
-	if err != nil {
-		textChatHandler.logger.Println("[ERROR] serializing message", err)
-		http.Error(responseWriter, "Unable to marshal json", http.StatusInternalServerError)
-	}
-}
-
-func (textChatHandler *TextChatHandler) GetConversations(responseWriter http.ResponseWriter, request *http.Request) {
-	textChatHandler.logger.Println("Handle GET conversation")
-	conversationList := data.GetConversations()
-	err := json.NewEncoder(responseWriter).Encode(conversationList)
-	if err != nil {
-		textChatHandler.logger.Println("[ERROR] serializing conversation", err)
-		http.Error(responseWriter, "Unable to marshal json", http.StatusInternalServerError)
-	}
-}
-
 func (textChatHandler *TextChatHandler) GetMessageByID(responseWriter http.ResponseWriter, request *http.Request) {
 	id := getTextChatID(request)
 
@@ -47,11 +27,6 @@ func (textChatHandler *TextChatHandler) GetMessageByID(responseWriter http.Respo
 		textChatHandler.logger.Println("[ERROR] fetching message", err)
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
-	}
-
-	err = json.NewEncoder(responseWriter).Encode(message)
-	if err != nil {
-		textChatHandler.logger.Println("[ERROR] serializing message", err)
 	}
 }
 
@@ -76,11 +51,6 @@ func (textChatHandler *TextChatHandler) GetConversationByID(responseWriter http.
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	err = json.NewEncoder(responseWriter).Encode(conversation)
-	if err != nil {
-		textChatHandler.logger.Println("[ERROR] serializing conversation", err)
-	}
 }
 
 func (textChatHandler *TextChatHandler) GetMessagesByConversationID(responseWriter http.ResponseWriter, request *http.Request) {
@@ -103,10 +73,5 @@ func (textChatHandler *TextChatHandler) GetMessagesByConversationID(responseWrit
 		textChatHandler.logger.Println("[ERROR] fetching messages", err)
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
-	}
-
-	err = json.NewEncoder(responseWriter).Encode(messages)
-	if err != nil {
-		textChatHandler.logger.Println("[ERROR] serializing messages", err)
 	}
 }

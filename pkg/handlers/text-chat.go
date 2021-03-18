@@ -11,7 +11,7 @@ import (
 // KeyMessage is a key used for the Message object inside context
 type KeyMessage struct{}
 
-// KeyConversation is a key used for the Message object inside context
+// KeyConversation is a key used for the Conversation object inside context
 type KeyConversation struct{}
 
 type TextChatHandler struct {

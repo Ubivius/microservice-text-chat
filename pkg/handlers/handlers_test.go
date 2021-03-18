@@ -18,36 +18,6 @@ func NewTestLogger() *log.Logger {
 	return log.New(os.Stdout, "Tests", log.LstdFlags)
 }
 
-func TestGetMessages(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, "/messages", nil)
-	response := httptest.NewRecorder()
-
-	textChatHandler := NewTextChatHandler(NewTestLogger())
-	textChatHandler.GetMessages(response, request)
-
-	if response.Code != 200 {
-		t.Errorf("Expected status code 200 but got : %d", response.Code)
-	}
-	if !strings.Contains(response.Body.String(), "\"id\":2") {
-		t.Error("Missing elements from expected results")
-	}
-}
-
-func TestGetConversations(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, "/conversations", nil)
-	response := httptest.NewRecorder()
-
-	textChatHandler := NewTextChatHandler(NewTestLogger())
-	textChatHandler.GetConversations(response, request)
-
-	if response.Code != 200 {
-		t.Errorf("Expected status code 200 but got : %d", response.Code)
-	}
-	if !strings.Contains(response.Body.String(), "\"id\":2") {
-		t.Error("Missing elements from expected results")
-	}
-}
-
 func TestGetExistingMessageByID(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/messages/1", nil)
 	response := httptest.NewRecorder()

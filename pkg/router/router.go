@@ -14,9 +14,7 @@ func New(textChatHandler *handlers.TextChatHandler, logger *log.Logger) *mux.Rou
 
 	// Get Router
 	getRouter := router.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/messages", textChatHandler.GetMessages)
 	getRouter.HandleFunc("/messages/{id:[0-9]+}", textChatHandler.GetMessageByID)
-	getRouter.HandleFunc("/conversations", textChatHandler.GetConversations)
 	getRouter.HandleFunc("/conversations/{id:[0-9]+}", textChatHandler.GetConversationByID)
 	getRouter.HandleFunc("/messages/conversation/{id:[0-9]+}", textChatHandler.GetMessagesByConversationID)
 

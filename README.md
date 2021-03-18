@@ -1,4 +1,4 @@
-# microservice-template
+# microservice-text-chat
 Text chat microservice for our online game framework.
 
 **Launch local ElasticSearch**

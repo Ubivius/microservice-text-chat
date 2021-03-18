@@ -12,7 +12,7 @@ var ErrorConversationNotFound = fmt.Errorf("Conversation not found")
 // Formatting done with json tags to the right. "-" : don't include when encoding to json
 type Conversation struct {
 	ID        int    `json:"id"`
-	UserID    []int  `json:"userid"`
+	UserID    []int  `json:"userid" validate:"required"`
 	GameID    int    `json:"gameid"`
 	CreatedOn string `json:"-"`
 	UpdatedOn string `json:"-"`
@@ -26,11 +26,6 @@ type Conversations []*Conversation
 func GetConversationID(userid []int) int {
 	lastConversation := conversationList[len(conversationList)-1]
 	return lastConversation.ID + 1
-}
-
-// GetConversations returns the list of conversations
-func GetConversations() Conversations {
-	return conversationList
 }
 
 // GetConversationByID returns a single conversation with the given id

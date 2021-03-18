@@ -12,8 +12,8 @@ var ErrorMessageNotFound = fmt.Errorf("Message not found")
 // Formatting done with json tags to the right. "-" : don't include when encoding to json
 type Message struct {
 	ID             int    `json:"id"`
-	UserID         int    `json:"userid"`
-	ConversationID int    `json:"conversationid"`
+	UserID         int    `json:"userid" validate:"required"`
+	ConversationID int    `json:"conversationid" validate:"required"`
 	Text           string `json:"text" validate:"required"`
 	CreatedOn      string `json:"-"`
 	UpdatedOn      string `json:"-"`
@@ -24,11 +24,6 @@ type Message struct {
 type Messages []*Message
 
 // All of these functions will become database calls in the future
-
-// GetMessages returns the list of messages
-func GetMessages() Messages {
-	return messageList
-}
 
 // GetMessageByID returns a single message with the given id
 func GetMessageByID(id int) (*Message, error) {
