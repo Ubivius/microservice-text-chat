@@ -11,6 +11,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func emptyHandler(responseWriter http.ResponseWriter, request *http.Request) {
+	responseWriter.WriteHeader(http.StatusAccepted)
+}
+
 func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	// Creating request body
 	body := &data.Message{
@@ -29,7 +33,7 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	router := mux.NewRouter()
 
 	postRouter := router.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/messages", textChatHandler.AddMessage)
+	postRouter.HandleFunc("/messages", emptyHandler)
 	postRouter.Use(textChatHandler.MiddlewareMessageValidation)
 
 	// Server http on our router
@@ -58,7 +62,7 @@ func TestValidationMiddlewareWithNoMessage(t *testing.T) {
 
 	// Create a router for middleware because linking is handled by gorilla/mux
 	router := mux.NewRouter()
-	router.HandleFunc("/messages", textChatHandler.AddMessage)
+	router.HandleFunc("/messages", emptyHandler)
 	router.Use(textChatHandler.MiddlewareMessageValidation)
 
 	// Server http on our router
