@@ -201,6 +201,29 @@ func TestAddMessage(t *testing.T) {
 	}
 }
 
+func TestAddMessageNonExistingConversation(t *testing.T) {
+	// Creating request body
+	body := &data.Message{
+		UserID:         1,
+		ConversationID: 10,
+		Text:           "This is a test message",
+	}
+
+	request := httptest.NewRequest(http.MethodPost, "/messages", nil)
+	response := httptest.NewRecorder()
+
+	// Add the body to the context since we arent passing through middleware
+	ctx := context.WithValue(request.Context(), KeyMessage{}, body)
+	request = request.WithContext(ctx)
+
+	textChatHandler := NewTextChatHandler(NewTestLogger())
+	textChatHandler.AddMessage(response, request)
+
+	if response.Code != http.StatusNoContent {
+		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, response.Code)
+	}
+}
+
 func TestAddConversation(t *testing.T) {
 	// Creating request body
 	body := &data.Conversation{

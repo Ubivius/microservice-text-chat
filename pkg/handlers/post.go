@@ -11,8 +11,12 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 	textChatHandler.logger.Println("Handle POST Message")
 	message := request.Context().Value(KeyMessage{}).(*data.Message)
 
-	data.AddMessage(message)
-
+	err := data.AddMessage(message)
+	if err == data.ErrorConversationNotFound {
+		textChatHandler.logger.Println("[ERROR] adding, id does not exist")
+		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
+		return
+	}
 	responseWriter.WriteHeader(http.StatusNoContent)
 }
 

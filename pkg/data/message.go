@@ -12,8 +12,8 @@ var ErrorMessageNotFound = fmt.Errorf("Message not found")
 // Formatting done with json tags to the right. "-" : don't include when encoding to json
 type Message struct {
 	ID             int    `json:"id"`
-	UserID         int    `json:"userid" validate:"isuser"`
-	ConversationID int    `json:"conversationid" validate:"isconversation"`
+	UserID         int    `json:"userid"`
+	ConversationID int    `json:"conversationid"`
 	Text           string `json:"text" validate:"required"`
 	CreatedOn      string `json:"-"`
 	UpdatedOn      string `json:"-"`
@@ -53,22 +53,15 @@ func GetMessagesByConversationID(id int) ([]*Message, error) {
 	return messages, nil
 }
 
-// UPDATING PRODUCTS
-
-// UpdateMessage updates the message specified in received JSON
-func UpdateMessage(message *Message) error {
-	index := findIndexByMessageID(message.ID)
-	if index == -1 {
-		return ErrorMessageNotFound
-	}
-	messageList[index] = message
-	return nil
-}
-
 // AddMessage creates a new message
-func AddMessage(message *Message) {
+func AddMessage(message *Message) error {
+	_, err := GetConversationByID(message.ConversationID)
+	if err != nil {
+		return err
+	}
 	message.ID = getNextMessageID()
 	messageList = append(messageList, message)
+	return nil
 }
 
 // DeleteMessage deletes the message with the given id
