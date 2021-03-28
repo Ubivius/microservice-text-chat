@@ -11,13 +11,20 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 	textChatHandler.logger.Println("Handle POST Message")
 	message := request.Context().Value(KeyMessage{}).(*data.Message)
 
-	err := data.AddMessage(message)
-	if err == data.ErrorConversationNotFound {
+	err := textChatHandler.db.AddMessage(message)
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	case data.ErrorConversationNotFound :
 		textChatHandler.logger.Println("[ERROR] adding, id does not exist")
 		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
 		return
+	default:
+		textChatHandler.logger.Println("[ERROR] adding message", err)
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	responseWriter.WriteHeader(http.StatusNoContent)
 }
 
 // AddConversation creates a new message from the received JSON
@@ -25,7 +32,15 @@ func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.Resp
 	textChatHandler.logger.Println("Handle POST Conversation")
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)
 
-	data.AddConversation(conversation)
+	err := textChatHandler.db.AddConversation(conversation)
 
-	responseWriter.WriteHeader(http.StatusNoContent)
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	default:
+		textChatHandler.logger.Println("[ERROR] adding conversation", err)
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

@@ -14,9 +14,9 @@ func New(textChatHandler *handlers.TextChatHandler, logger *log.Logger) *mux.Rou
 
 	// Get Router
 	getRouter := router.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/messages/{id:[0-9]+}", textChatHandler.GetMessageByID)
-	getRouter.HandleFunc("/conversations/{id:[0-9]+}", textChatHandler.GetConversationByID)
-	getRouter.HandleFunc("/messages/conversation/{id:[0-9]+}", textChatHandler.GetMessagesByConversationID)
+	getRouter.HandleFunc("/messages/{id:[0-9a-z-]+}", textChatHandler.GetMessageByID)
+	getRouter.HandleFunc("/conversations/{id:[0-9a-z-]+}", textChatHandler.GetConversationByID)
+	getRouter.HandleFunc("/messages/conversation/{id:[0-9a-z-]+}", textChatHandler.GetMessagesByConversationID)
 
 	// Message post router
 	messagePostRouter := router.Methods(http.MethodPost).Subrouter()
@@ -30,8 +30,8 @@ func New(textChatHandler *handlers.TextChatHandler, logger *log.Logger) *mux.Rou
 
 	// Delete router
 	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
-	deleteRouter.HandleFunc("/messages/{id:[0-9]+}", textChatHandler.DeleteMessage)
-	deleteRouter.HandleFunc("/conversations/{id:[0-9]+}", textChatHandler.DeleteConversation)
+	deleteRouter.HandleFunc("/messages/{id:[0-9a-z-]+}", textChatHandler.DeleteMessage)
+	deleteRouter.HandleFunc("/conversations/{id:[0-9a-z-]+}", textChatHandler.DeleteConversation)
 
 	return router
 }

@@ -18,8 +18,8 @@ func emptyHandler(responseWriter http.ResponseWriter, request *http.Request) {
 func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	// Creating request body
 	body := &data.Message{
-		UserID:         1,
-		ConversationID: 1,
+		UserID:         "a2181017-5c53-422b-b6bc-036b27c04fc8",
+		ConversationID: "a2181017-5c53-422b-b6bc-036b27c04fc8",
 		Text:           "This is a test message",
 	}
 
@@ -27,7 +27,7 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/messages", strings.NewReader(string(bodyBytes)))
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger())
+	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
 
 	// Create a router for middleware because function attachment is handled by gorilla/mux
 	router := mux.NewRouter()
@@ -47,8 +47,8 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 func TestValidationMiddlewareWithNoMessage(t *testing.T) {
 	// Creating request body
 	body := &data.Message{
-		UserID:         1,
-		ConversationID: 1,
+		UserID:         "a2181017-5c53-422b-b6bc-036b27c04fc8",
+		ConversationID: "a2181017-5c53-422b-b6bc-036b27c04fc8",
 	}
 	bodyBytes, err := json.Marshal(body)
 	if err != nil {
@@ -58,7 +58,7 @@ func TestValidationMiddlewareWithNoMessage(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/messages", strings.NewReader(string(bodyBytes)))
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger())
+	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
 
 	// Create a router for middleware because linking is handled by gorilla/mux
 	router := mux.NewRouter()

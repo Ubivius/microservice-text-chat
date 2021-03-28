@@ -11,20 +11,21 @@ func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.Respon
 	id := getTextChatID(request)
 	textChatHandler.logger.Println("Handle DELETE message", id)
 
-	err := data.DeleteMessage(id)
-	if err == data.ErrorMessageNotFound {
+	err := textChatHandler.db.DeleteMessage(id)
+
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	case data.ErrorMessageNotFound :
 		textChatHandler.logger.Println("[ERROR] deleting, id does not exist")
 		http.Error(responseWriter, "Message not found", http.StatusNotFound)
 		return
-	}
-
-	if err != nil {
+	default:
 		textChatHandler.logger.Println("[ERROR] deleting message", err)
 		http.Error(responseWriter, "Erro deleting message", http.StatusInternalServerError)
 		return
 	}
-
-	responseWriter.WriteHeader(http.StatusNoContent)
 }
 
 // Delete a conversation with specified id from the database
@@ -34,18 +35,19 @@ func (textChatHandler *TextChatHandler) DeleteConversation(responseWriter http.R
 
 	// TODO: Delete all messages from the conversation
 
-	err := data.DeleteConversation(id)
-	if err == data.ErrorConversationNotFound {
+	err := textChatHandler.db.DeleteConversation(id)
+
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	case data.ErrorConversationNotFound :
 		textChatHandler.logger.Println("[ERROR] deleting, id does not exist")
 		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
 		return
-	}
-
-	if err != nil {
+	default:
 		textChatHandler.logger.Println("[ERROR] deleting conversation", err)
 		http.Error(responseWriter, "Error deleting conversation", http.StatusInternalServerError)
 		return
 	}
-
-	responseWriter.WriteHeader(http.StatusNoContent)
 }

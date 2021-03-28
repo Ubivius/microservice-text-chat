@@ -12,13 +12,14 @@ func (textChatHandler *TextChatHandler) GetMessageByID(responseWriter http.Respo
 
 	textChatHandler.logger.Println("[DEBUG] getting id", id)
 
-	message, err := data.GetMessageByID(id)
+	message, err := textChatHandler.db.GetMessageByID(id)
 	switch err {
 	case nil:
 		err = json.NewEncoder(responseWriter).Encode(message)
 		if err != nil {
 			textChatHandler.logger.Println("[ERROR] serializing message", err)
 		}
+		return
 	case data.ErrorMessageNotFound:
 		textChatHandler.logger.Println("[ERROR] fetching message", err)
 		http.Error(responseWriter, "Message not found", http.StatusBadRequest)
@@ -35,13 +36,14 @@ func (textChatHandler *TextChatHandler) GetConversationByID(responseWriter http.
 
 	textChatHandler.logger.Println("[DEBUG] getting id", id)
 
-	conversation, err := data.GetConversationByID(id)
+	conversation, err := textChatHandler.db.GetConversationByID(id)
 	switch err {
 	case nil:
 		err = json.NewEncoder(responseWriter).Encode(conversation)
 		if err != nil {
 			textChatHandler.logger.Println("[ERROR] serializing conversation", err)
 		}
+		return
 	case data.ErrorConversationNotFound:
 		textChatHandler.logger.Println("[ERROR] fetching conversation", err)
 		http.Error(responseWriter, "Conversation not found", http.StatusBadRequest)
@@ -58,13 +60,14 @@ func (textChatHandler *TextChatHandler) GetMessagesByConversationID(responseWrit
 
 	textChatHandler.logger.Println("[DEBUG] getting id", id)
 
-	messages, err := data.GetMessagesByConversationID(id)
+	messages, err := textChatHandler.db.GetMessagesByConversationID(id)
 	switch err {
 	case nil:
 		err = json.NewEncoder(responseWriter).Encode(messages)
 		if err != nil {
 			textChatHandler.logger.Println("[ERROR] serializing messages", err)
 		}
+		return
 	case data.ErrorMessageNotFound:
 		textChatHandler.logger.Println("[ERROR] fetching messages", err)
 		http.Error(responseWriter, "Message not found", http.StatusBadRequest)
