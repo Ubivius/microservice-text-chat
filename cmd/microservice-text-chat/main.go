@@ -8,15 +8,15 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Ubivius/microservice-template/handlers"
-	"github.com/gorilla/mux"
+	"github.com/Ubivius/microservice-text-chat/pkg/handlers"
+	"github.com/Ubivius/microservice-text-chat/pkg/router"
 	"go.opentelemetry.io/otel/exporters/stdout"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 func main() {
 	// Logger
-	logger := log.New(os.Stdout, "Template", log.LstdFlags)
+	logger := log.New(os.Stdout, "Text-Chat", log.LstdFlags)
 
 	// Initialising open telemetry
 
@@ -35,34 +35,15 @@ func main() {
 	defer func() { _ = tracerProvider.Shutdown(ctx) }()
 
 	// Creating handlers
-	productHandler := handlers.NewProductsHandler(logger)
+	textChatHandler := handlers.NewTextChatHandler(logger)
 
 	// Mux route handling with gorilla/mux
-	router := mux.NewRouter()
-
-	// Get Router
-	getRouter := router.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/products", productHandler.GetProducts)
-	getRouter.HandleFunc("/products/{id:[0-9]+}", productHandler.GetProductByID)
-
-	// Put router
-	putRouter := router.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/products", productHandler.UpdateProducts)
-	putRouter.Use(productHandler.MiddlewareProductValidation)
-
-	// Post router
-	postRouter := router.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/products", productHandler.AddProduct)
-	postRouter.Use(productHandler.MiddlewareProductValidation)
-
-	// Delete router
-	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
-	deleteRouter.HandleFunc("/products/{id:[0-9]+}", productHandler.Delete)
+	r := router.New(textChatHandler, logger)
 
 	// Server setup
 	server := &http.Server{
 		Addr:        ":9090",
-		Handler:     router,
+		Handler:     r,
 		IdleTimeout: 120 * time.Second,
 		ReadTimeout: 1 * time.Second,
 	}
