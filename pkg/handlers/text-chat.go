@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/database"
@@ -15,12 +14,11 @@ type KeyMessage struct{}
 type KeyConversation struct{}
 
 type TextChatHandler struct {
-	logger *log.Logger
-	db     database.TextChatDB
+	db database.TextChatDB
 }
 
-func NewTextChatHandler(logger *log.Logger, db database.TextChatDB) *TextChatHandler {
-	return &TextChatHandler{logger, db}
+func NewTextChatHandler(db database.TextChatDB) *TextChatHandler {
+	return &TextChatHandler{db}
 }
 
 // getTextChatID extracts the conversation/message ID from the URL

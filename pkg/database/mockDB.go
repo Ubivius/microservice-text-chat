@@ -1,7 +1,6 @@
 package database
 
 import (
-	"log"
 	"time"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
@@ -12,6 +11,7 @@ type MockTextChat struct {
 }
 
 func NewMockTextChat() TextChatDB {
+	log.Info("Connecting to mock database")
 	return &MockTextChat{}
 }
 
@@ -20,7 +20,7 @@ func (mp *MockTextChat) Connect() error {
 }
 
 func (mp *MockTextChat) CloseDB() {
-	log.Println("Mocked DB connection closed")
+	log.Info("Mocked DB connection closed")
 }
 
 func (mp *MockTextChat) GetMessageByID(id string) (*data.Message, error) {

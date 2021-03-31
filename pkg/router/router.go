@@ -1,7 +1,6 @@
 package router
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/handlers"
@@ -9,7 +8,8 @@ import (
 )
 
 // Mux route handling with gorilla/mux
-func New(textChatHandler *handlers.TextChatHandler, logger *log.Logger) *mux.Router {
+func New(textChatHandler *handlers.TextChatHandler) *mux.Router {
+	log.Info("Starting router")
 	router := mux.NewRouter()
 
 	// Get Router

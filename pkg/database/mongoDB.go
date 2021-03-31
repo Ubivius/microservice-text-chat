@@ -2,7 +2,7 @@ package database
 
 import (
 	"context"
-	"log"
+	"os"
 	"time"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
@@ -16,15 +16,15 @@ type MongoTextChat struct {
 	client                  *mongo.Client
 	messagesCollection      *mongo.Collection
 	conversationsCollection *mongo.Collection
-	logger                  *log.Logger
 }
 
-func NewMongoTextChat(l *log.Logger) TextChatDB {
-	mp := &MongoTextChat{logger: l}
+func NewMongoTextChat() TextChatDB {
+	mp := &MongoTextChat{}
 	err := mp.Connect()
 	// If connect fails, kill the program
 	if err != nil {
-		mp.logger.Fatal(err)
+		log.Error(err, "MongoDB setup failed")
+		os.Exit(1)
 	}
 	return mp
 }
@@ -36,16 +36,18 @@ func (mp *MongoTextChat) Connect() error {
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil || client == nil {
-		mp.logger.Fatalln("Failed to connect to database. Shutting down service")
+		log.Error(err, "Failed to connect to database. Shutting down service")
+		os.Exit(1)
 	}
 
 	// Ping DB
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		mp.logger.Fatal(err)
+		log.Error(err, "Failed to ping database. Shutting down service")
+		os.Exit(1)
 	}
 
-	log.Println("Connection to MongoDB established")
+	log.Info("Connection to MongoDB established")
 
 	messagesCollection := client.Database("ubivius").Collection("messages")
 	conversationsCollection := client.Database("ubivius").Collection("conversations")
@@ -60,9 +62,7 @@ func (mp *MongoTextChat) Connect() error {
 func (mp *MongoTextChat) CloseDB() {
 	err := mp.client.Disconnect(context.TODO())
 	if err != nil {
-		mp.logger.Println(err)
-	} else {
-		log.Println("Connection to MongoDB closed.")
+		log.Error(err, "Error while disconnecting from database")
 	}
 }
 
@@ -104,7 +104,7 @@ func (mp *MongoTextChat) GetMessagesByConversationID(id string) (data.Messages, 
 	// Find returns a cursor that must be iterated through
 	cursor, err := mp.messagesCollection.Find(context.TODO(), filter)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err, "Error getting messages by conversationID from database")
 	}
 
 	// Iterating through cursor
@@ -112,13 +112,13 @@ func (mp *MongoTextChat) GetMessagesByConversationID(id string) (data.Messages, 
 		var result data.Message
 		err := cursor.Decode(&result)
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err, "Error decoding messages from database")
 		}
 		messages = append(messages, &result)
 	}
 
 	if err := cursor.Err(); err != nil {
-		log.Fatal(err)
+		log.Error(err, "Error in cursor after iteration")
 	}
 
 	// Close the cursor once finished
@@ -150,7 +150,7 @@ func (mp *MongoTextChat) AddMessage(message *data.Message) error {
 		return err
 	}
 
-	log.Println("Inserting a document: ", insertResult.InsertedID)
+	log.Info("Inserting message", "Inserted ID", insertResult.InsertedID)
 	return nil
 }
 
@@ -169,7 +169,7 @@ func (mp *MongoTextChat) AddConversation(conversation *data.Conversation) error 
 		return err
 	}
 
-	log.Println("Inserting a document: ", insertResult.InsertedID)
+	log.Info("Inserting conversation", "Inserted ID", insertResult.InsertedID)
 	return nil
 }
 
@@ -180,10 +180,10 @@ func (mp *MongoTextChat) DeleteMessage(id string) error {
 	// Delete a single item matching the filter
 	result, err := mp.messagesCollection.DeleteOne(context.TODO(), filter)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err, "Error deleting message")
 	}
 
-	log.Printf("Deleted %v documents in the messages collection\n", result.DeletedCount)
+	log.Info("Deleted documents in messages collection", "delete_count", result.DeletedCount)
 	return nil
 }
 
@@ -194,9 +194,9 @@ func (mp *MongoTextChat) DeleteConversation(id string) error {
 	// Delete a single item matching the filter
 	result, err := mp.conversationsCollection.DeleteOne(context.TODO(), filter)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err, "Error deleting conversation")
 	}
 
-	log.Printf("Deleted %v documents in the conversations collection\n", result.DeletedCount)
+	log.Info("Deleted documents in conversations collection", "delete_count", result.DeletedCount)
 	return nil
 }

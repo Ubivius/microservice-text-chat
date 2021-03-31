@@ -18,7 +18,7 @@ func (textChatHandler *TextChatHandler) MiddlewareMessageValidation(next http.Ha
 		message := &data.Message{}
 		err := json.NewDecoder(request.Body).Decode(message)
 		if err != nil {
-			textChatHandler.logger.Println("[ERROR] deserializing message", err)
+			log.Error(err, "Error deserializing message")
 			http.Error(responseWriter, "Error reading message", http.StatusBadRequest)
 			return
 		}
@@ -26,7 +26,7 @@ func (textChatHandler *TextChatHandler) MiddlewareMessageValidation(next http.Ha
 		// validate the message
 		err = message.ValidateMessage()
 		if err != nil {
-			textChatHandler.logger.Println("[ERROR] validating message", err)
+			log.Error(err, "Error validating message")
 			http.Error(responseWriter, fmt.Sprintf("Error validating message: %s", err), http.StatusBadRequest)
 			return
 		}
@@ -47,7 +47,7 @@ func (textChatHandler *TextChatHandler) MiddlewareConversationValidation(next ht
 
 		err := json.NewDecoder(request.Body).Decode(conversation)
 		if err != nil {
-			textChatHandler.logger.Println("[ERROR] deserializing conversation", err)
+			log.Error(err, "Error deserializing conversation")
 			http.Error(responseWriter, "Error reading conversation", http.StatusBadRequest)
 			return
 		}
@@ -55,7 +55,7 @@ func (textChatHandler *TextChatHandler) MiddlewareConversationValidation(next ht
 		// validate the conversation
 		err = conversation.ValidateConversation()
 		if err != nil {
-			textChatHandler.logger.Println("[ERROR] validating conversation", err)
+			log.Error(err, "Error validating conversation")
 			http.Error(responseWriter, fmt.Sprintf("Error validating conversation: %s", err), http.StatusBadRequest)
 			return
 		}

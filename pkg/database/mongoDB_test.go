@@ -1,23 +1,17 @@
 package database
 
 import (
-	"log"
-	"os"
 	"testing"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
 )
-
-func NewTestLogger() *log.Logger {
-	return log.New(os.Stdout, "Tests", log.LstdFlags)
-}
 
 func TestMongoDBConnectionAndShutdownIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Test skipped during unit tests")
 	}
 
-	mp := NewMongoTextChat(NewTestLogger())
+	mp := NewMongoTextChat()
 	if mp == nil {
 		t.Fail()
 	}
@@ -35,7 +29,7 @@ func TestMongoDBAddMessageIntegration(t *testing.T) {
 		Text:           "testText",
 	}
 
-	mp := NewMongoTextChat(NewTestLogger())
+	mp := NewMongoTextChat()
 	err := mp.AddMessage(message)
 	if err != nil {
 		t.Errorf("Failed to add message to database")
@@ -56,7 +50,7 @@ func TestMongoDBAddConversationIntegration(t *testing.T) {
 		GameID: "",
 	}
 
-	mp := NewMongoTextChat(NewTestLogger())
+	mp := NewMongoTextChat()
 	err := mp.AddConversation(conversation)
 	if err != nil {
 		t.Errorf("Failed to add conversation to database")
@@ -69,7 +63,7 @@ func TestMongoDBGetMessageByIDIntegration(t *testing.T) {
 		t.Skip("Test skipped during unit tests")
 	}
 
-	mp := NewMongoTextChat(NewTestLogger())
+	mp := NewMongoTextChat()
 	_, err := mp.GetMessageByID("a2181017-5c53-422b-b6bc-036b27c04fc8")
 	if err != nil {
 		t.Fail()
@@ -83,7 +77,7 @@ func TestMongoDBGetConversationByIDIntegration(t *testing.T) {
 		t.Skip("Test skipped during unit tests")
 	}
 
-	mp := NewMongoTextChat(NewTestLogger())
+	mp := NewMongoTextChat()
 	_, err := mp.GetConversationByID("a2181017-5c53-422b-b6bc-036b27c04fc8")
 	if err != nil {
 		t.Fail()
@@ -97,7 +91,7 @@ func TestMongoDBGetMessagesByConversationIDIntegration(t *testing.T) {
 		t.Skip("Test skipped during unit tests")
 	}
 
-	mp := NewMongoTextChat(NewTestLogger())
+	mp := NewMongoTextChat()
 	_, err := mp.GetMessagesByConversationID("a2181017-5c53-422b-b6bc-036b27c04fc8")
 	if err != nil {
 		t.Fail()

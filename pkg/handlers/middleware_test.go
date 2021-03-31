@@ -27,7 +27,7 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/messages", strings.NewReader(string(bodyBytes)))
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Create a router for middleware because function attachment is handled by gorilla/mux
 	router := mux.NewRouter()
@@ -58,7 +58,7 @@ func TestValidationMiddlewareWithNoMessage(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/messages", strings.NewReader(string(bodyBytes)))
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Create a router for middleware because linking is handled by gorilla/mux
 	router := mux.NewRouter()

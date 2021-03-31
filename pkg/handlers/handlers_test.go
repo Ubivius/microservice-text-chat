@@ -2,10 +2,8 @@ package handlers
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
@@ -15,11 +13,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Move to util package in Sprint 9, should be a testing specific logger
-func NewTestLogger() *log.Logger {
-	return log.New(os.Stdout, "Tests", log.LstdFlags)
-}
-
 func newTextChatDB() database.TextChatDB {
 	return database.NewMockTextChat()
 }
@@ -28,7 +21,7 @@ func TestGetExistingMessageByID(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/messages/a2181017-5c53-422b-b6bc-036b27c04fc8", nil)
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
@@ -50,7 +43,7 @@ func TestGetExistingConversationByID(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/conversations/a2181017-5c53-422b-b6bc-036b27c04fc8", nil)
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
@@ -72,7 +65,7 @@ func TestGetNonExistingMessageByID(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/messages/4", nil)
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
@@ -94,7 +87,7 @@ func TestGetNonExistingConversationByID(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/conversations/4", nil)
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
@@ -116,7 +109,7 @@ func TestDeleteNonExistantMessage(t *testing.T) {
 	request := httptest.NewRequest(http.MethodDelete, "/messages/4", nil)
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
@@ -137,7 +130,7 @@ func TestDeleteNonExistingConversation(t *testing.T) {
 	request := httptest.NewRequest(http.MethodDelete, "/conversations/4", nil)
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
@@ -169,7 +162,7 @@ func TestAddMessage(t *testing.T) {
 	ctx := context.WithValue(request.Context(), KeyMessage{}, body)
 	request = request.WithContext(ctx)
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 	textChatHandler.AddMessage(response, request)
 
 	if response.Code != http.StatusNoContent {
@@ -192,7 +185,7 @@ func TestAddMessageNonExistingConversation(t *testing.T) {
 	ctx := context.WithValue(request.Context(), KeyMessage{}, body)
 	request = request.WithContext(ctx)
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 	textChatHandler.AddMessage(response, request)
 
 	if response.Code != http.StatusNotFound {
@@ -214,7 +207,7 @@ func TestAddConversation(t *testing.T) {
 	ctx := context.WithValue(request.Context(), KeyConversation{}, body)
 	request = request.WithContext(ctx)
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 	textChatHandler.AddConversation(response, request)
 
 	if response.Code != http.StatusNoContent {
@@ -226,7 +219,7 @@ func TestDeleteExistingMessage(t *testing.T) {
 	request := httptest.NewRequest(http.MethodDelete, "/messages/a2181017-5c53-422b-b6bc-036b27c04fc8", nil)
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
@@ -244,7 +237,7 @@ func TestDeleteExistingConversation(t *testing.T) {
 	request := httptest.NewRequest(http.MethodDelete, "/conversations/a2181017-5c53-422b-b6bc-036b27c04fc8", nil)
 	response := httptest.NewRecorder()
 
-	textChatHandler := NewTextChatHandler(NewTestLogger(), newTextChatDB())
+	textChatHandler := NewTextChatHandler(newTextChatDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{

@@ -9,7 +9,7 @@ import (
 // Delete a message with specified id from the database
 func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.ResponseWriter, request *http.Request) {
 	id := getTextChatID(request)
-	textChatHandler.logger.Println("Handle DELETE message", id)
+	log.Info("Delete message by ID request", "id", id)
 
 	err := textChatHandler.db.DeleteMessage(id)
 
@@ -18,11 +18,11 @@ func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.Respon
 		responseWriter.WriteHeader(http.StatusNoContent)
 		return
 	case data.ErrorMessageNotFound :
-		textChatHandler.logger.Println("[ERROR] deleting, id does not exist")
+		log.Error(err, "Error deleting message, id does not exist")
 		http.Error(responseWriter, "Message not found", http.StatusNotFound)
 		return
 	default:
-		textChatHandler.logger.Println("[ERROR] deleting message", err)
+		log.Error(err, "Error deleting message")
 		http.Error(responseWriter, "Erro deleting message", http.StatusInternalServerError)
 		return
 	}
@@ -31,7 +31,7 @@ func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.Respon
 // Delete a conversation with specified id from the database
 func (textChatHandler *TextChatHandler) DeleteConversation(responseWriter http.ResponseWriter, request *http.Request) {
 	id := getTextChatID(request)
-	textChatHandler.logger.Println("Handle DELETE conversation", id)
+	log.Info("Delete conversation by ID request", "id", id)
 
 	// TODO: Delete all messages from the conversation
 
@@ -42,11 +42,11 @@ func (textChatHandler *TextChatHandler) DeleteConversation(responseWriter http.R
 		responseWriter.WriteHeader(http.StatusNoContent)
 		return
 	case data.ErrorConversationNotFound :
-		textChatHandler.logger.Println("[ERROR] deleting, id does not exist")
+		log.Error(err, "Error deleting conversation, id does not exist")
 		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
 		return
 	default:
-		textChatHandler.logger.Println("[ERROR] deleting conversation", err)
+		log.Error(err, "Error deleting conversation")
 		http.Error(responseWriter, "Error deleting conversation", http.StatusInternalServerError)
 		return
 	}
