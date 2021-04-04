@@ -127,10 +127,6 @@ func (mp *MongoTextChat) GetMessagesByConversationID(id string) (data.Messages, 
 	return messages, err
 }
 
-func (mp *MongoTextChat) GetConversationID(userID []string) string {
-	return uuid.NewString()
-}
-
 func (mp *MongoTextChat) AddMessage(message *data.Message) error {
 	_, err := mp.GetConversationByID(message.ConversationID)
 	if err != nil {

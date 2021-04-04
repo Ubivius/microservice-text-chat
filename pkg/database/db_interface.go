@@ -13,7 +13,6 @@ type TextChatDB interface {
 	AddConversation(conversation *data.Conversation) error
 	DeleteMessage(id string) error
 	DeleteConversation(id string) error
-	GetConversationID(userID []string) string
 	Connect() error
 	CloseDB()
 }
