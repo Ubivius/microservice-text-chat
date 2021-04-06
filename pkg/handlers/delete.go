@@ -9,43 +9,45 @@ import (
 // Delete a message with specified id from the database
 func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.ResponseWriter, request *http.Request) {
 	id := getTextChatID(request)
-	textChatHandler.logger.Println("Handle DELETE message", id)
+	log.Info("Delete message by ID request", "id", id)
 
-	err := data.DeleteMessage(id)
-	if err == data.ErrorMessageNotFound {
-		textChatHandler.logger.Println("[ERROR] deleting, id does not exist")
+	err := textChatHandler.db.DeleteMessage(id)
+
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	case data.ErrorMessageNotFound :
+		log.Error(err, "Error deleting message, id does not exist")
 		http.Error(responseWriter, "Message not found", http.StatusNotFound)
 		return
-	}
-
-	if err != nil {
-		textChatHandler.logger.Println("[ERROR] deleting message", err)
+	default:
+		log.Error(err, "Error deleting message")
 		http.Error(responseWriter, "Erro deleting message", http.StatusInternalServerError)
 		return
 	}
-
-	responseWriter.WriteHeader(http.StatusNoContent)
 }
 
 // Delete a conversation with specified id from the database
 func (textChatHandler *TextChatHandler) DeleteConversation(responseWriter http.ResponseWriter, request *http.Request) {
 	id := getTextChatID(request)
-	textChatHandler.logger.Println("Handle DELETE conversation", id)
+	log.Info("Delete conversation by ID request", "id", id)
 
 	// TODO: Delete all messages from the conversation
 
-	err := data.DeleteConversation(id)
-	if err == data.ErrorConversationNotFound {
-		textChatHandler.logger.Println("[ERROR] deleting, id does not exist")
+	err := textChatHandler.db.DeleteConversation(id)
+
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	case data.ErrorConversationNotFound :
+		log.Error(err, "Error deleting conversation, id does not exist")
 		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
 		return
-	}
-
-	if err != nil {
-		textChatHandler.logger.Println("[ERROR] deleting conversation", err)
+	default:
+		log.Error(err, "Error deleting conversation")
 		http.Error(responseWriter, "Error deleting conversation", http.StatusInternalServerError)
 		return
 	}
-
-	responseWriter.WriteHeader(http.StatusNoContent)
 }

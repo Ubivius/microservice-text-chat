@@ -8,24 +8,39 @@ import (
 
 // AddMessage creates a new message from the received JSON
 func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseWriter, request *http.Request) {
-	textChatHandler.logger.Println("Handle POST Message")
+	log.Info("AddMessage request")
 	message := request.Context().Value(KeyMessage{}).(*data.Message)
 
-	err := data.AddMessage(message)
-	if err == data.ErrorConversationNotFound {
-		textChatHandler.logger.Println("[ERROR] adding, id does not exist")
+	err := textChatHandler.db.AddMessage(message)
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	case data.ErrorConversationNotFound :
+		log.Error(err, "Conversation not found")
 		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
 		return
+	default:
+		log.Error(err, "Error adding message")
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	responseWriter.WriteHeader(http.StatusNoContent)
 }
 
 // AddConversation creates a new message from the received JSON
 func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.ResponseWriter, request *http.Request) {
-	textChatHandler.logger.Println("Handle POST Conversation")
+	log.Info("AddConversation request")
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)
 
-	data.AddConversation(conversation)
+	err := textChatHandler.db.AddConversation(conversation)
 
-	responseWriter.WriteHeader(http.StatusNoContent)
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	default:
+		log.Error(err, "Error adding conversation")
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

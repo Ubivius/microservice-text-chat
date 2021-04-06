@@ -1,7 +1,6 @@
 package router
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/handlers"
@@ -9,14 +8,15 @@ import (
 )
 
 // Mux route handling with gorilla/mux
-func New(textChatHandler *handlers.TextChatHandler, logger *log.Logger) *mux.Router {
+func New(textChatHandler *handlers.TextChatHandler) *mux.Router {
+	log.Info("Starting router")
 	router := mux.NewRouter()
 
 	// Get Router
 	getRouter := router.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/messages/{id:[0-9]+}", textChatHandler.GetMessageByID)
-	getRouter.HandleFunc("/conversations/{id:[0-9]+}", textChatHandler.GetConversationByID)
-	getRouter.HandleFunc("/messages/conversation/{id:[0-9]+}", textChatHandler.GetMessagesByConversationID)
+	getRouter.HandleFunc("/messages/{id:[0-9a-z-]+}", textChatHandler.GetMessageByID)
+	getRouter.HandleFunc("/conversations/{id:[0-9a-z-]+}", textChatHandler.GetConversationByID)
+	getRouter.HandleFunc("/messages/conversation/{id:[0-9a-z-]+}", textChatHandler.GetMessagesByConversationID)
 
 	// Message post router
 	messagePostRouter := router.Methods(http.MethodPost).Subrouter()
@@ -30,8 +30,8 @@ func New(textChatHandler *handlers.TextChatHandler, logger *log.Logger) *mux.Rou
 
 	// Delete router
 	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
-	deleteRouter.HandleFunc("/messages/{id:[0-9]+}", textChatHandler.DeleteMessage)
-	deleteRouter.HandleFunc("/conversations/{id:[0-9]+}", textChatHandler.DeleteConversation)
+	deleteRouter.HandleFunc("/messages/{id:[0-9a-z-]+}", textChatHandler.DeleteMessage)
+	deleteRouter.HandleFunc("/conversations/{id:[0-9a-z-]+}", textChatHandler.DeleteConversation)
 
 	return router
 }
