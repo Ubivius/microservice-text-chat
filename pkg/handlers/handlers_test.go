@@ -210,8 +210,8 @@ func TestAddConversation(t *testing.T) {
 	textChatHandler := NewTextChatHandler(newTextChatDB())
 	textChatHandler.AddConversation(response, request)
 
-	if response.Code != http.StatusNoContent {
-		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, response.Code)
+	if response.Code != http.StatusOK {
+		t.Errorf("Expected status code %d, but got %d", http.StatusOK, response.Code)
 	}
 }
 
