@@ -51,7 +51,7 @@ func TestMongoDBAddConversationIntegration(t *testing.T) {
 	}
 
 	mp := NewMongoTextChat()
-	err := mp.AddConversation(conversation)
+	_, err := mp.AddConversation(conversation)
 	if err != nil {
 		t.Errorf("Failed to add conversation to database")
 	}

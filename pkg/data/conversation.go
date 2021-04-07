@@ -5,7 +5,10 @@ import (
 )
 
 // ErrorConversationNotFound : Conversation specific errors
-var ErrorConversationNotFound = fmt.Errorf("Conversation not found")
+var ErrorConversationNotFound = fmt.Errorf("conversation not found")
+
+// ErrorGameNotFound : Game specific errors
+var ErrorGameNotFound = fmt.Errorf("game not found")
 
 // Conversation defines the structure for an API conversation.
 type Conversation struct {

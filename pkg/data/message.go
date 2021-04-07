@@ -5,7 +5,10 @@ import (
 )
 
 // ErrorMessageNotFound : Message specific errors
-var ErrorMessageNotFound = fmt.Errorf("Message not found")
+var ErrorMessageNotFound = fmt.Errorf("message not found")
+
+// ErrorUserNotFound : User specific errors
+var ErrorUserNotFound = fmt.Errorf("user not found")
 
 // Message defines the structure for an API message.
 type Message struct {
@@ -19,3 +22,5 @@ type Message struct {
 
 // Messages is a collection of Message
 type Messages []*Message
+
+const MicroserviceUserPath = "http://microservice-user:9090"

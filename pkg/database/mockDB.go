@@ -19,6 +19,10 @@ func (mp *MockTextChat) Connect() error {
 	return nil
 }
 
+func (mp *MockTextChat) PingDB() error {
+	return nil
+}
+
 func (mp *MockTextChat) CloseDB() {
 	log.Info("Mocked DB connection closed")
 }
@@ -44,10 +48,6 @@ func (mp *MockTextChat) GetMessagesByConversationID(id string) (data.Messages, e
 	return messages, nil
 }
 
-func (mp *MockTextChat) GetConversationID(userID []string) string {
-	return uuid.NewString()
-}
-
 func (mp *MockTextChat) GetConversationByID(id string) (*data.Conversation, error) {
 	index := findIndexByConversationID(id)
 	if index == -1 {
@@ -62,19 +62,29 @@ func (mp *MockTextChat) AddMessage(message *data.Message) error {
 		return err
 	}
 
-	// TODO: Verify if user exist
+	if !mp.validateUserExist(message.UserID){
+		return data.ErrorUserNotFound
+	}
 
 	message.ID = uuid.NewString()
 	messageList = append(messageList, message)
 	return nil
 }
 
-func (mp *MockTextChat) AddConversation(conversation *data.Conversation) error {
-	// TODO: Verify if all user exists
-	// TODO: Veryfy if game exist
+func (mp *MockTextChat) AddConversation(conversation *data.Conversation) (*data.Conversation, error) {
+	for _ , userID := range conversation.UserID {
+		if !mp.validateUserExist(userID){
+			return nil, data.ErrorUserNotFound
+		}
+	}
+
+	if !mp.validateGameExist(conversation.GameID){
+		return nil, data.ErrorGameNotFound
+	}
+
 	conversation.ID = uuid.NewString()
 	conversationList = append(conversationList, conversation)
-	return nil
+	return conversation, nil
 }
 
 func (mp *MockTextChat) DeleteMessage(id string) error {
@@ -120,6 +130,14 @@ func findIndexByConversationID(id string) int {
 		}
 	}
 	return -1
+}
+
+func (mp *MockTextChat) validateUserExist(userID string) bool {
+	return true
+}
+
+func (mp *MockTextChat) validateGameExist(gameID string) bool {
+	return true
 }
 
 ////////////////////////////////////////////////////////////////////////////////
