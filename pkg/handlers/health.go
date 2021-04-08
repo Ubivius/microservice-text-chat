@@ -16,10 +16,6 @@ func (textChatHandler *TextChatHandler) LivenessCheck(responseWriter http.Respon
 func (textChatHandler *TextChatHandler) ReadinessCheck(responseWriter http.ResponseWriter, request *http.Request) {
 	log.Info("ReadinessCheck")
 
-	readinessProbeMicroserviceUser := data.MicroserviceUserPath + "/health/ready"
-
-	_, errMicroserviceUser := http.Get(readinessProbeMicroserviceUser)
-
 	err := textChatHandler.db.PingDB()
 
 	if err != nil {
@@ -28,8 +24,11 @@ func (textChatHandler *TextChatHandler) ReadinessCheck(responseWriter http.Respo
 		return
 	}
 
-	if errMicroserviceUser != nil {
-		log.Error(errMicroserviceUser, "Microservice-user unavailable")
+	readinessProbeMicroserviceUser := data.MicroserviceUserPath + "/health/ready"
+	_, err = http.Get(readinessProbeMicroserviceUser)
+
+	if err != nil {
+		log.Error(err, "Microservice-user unavailable")
 		http.Error(responseWriter, "Microservice-user unavailable", http.StatusServiceUnavailable)
 		return
 	}
