@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"time"
 
@@ -57,6 +58,10 @@ func (mp *MongoTextChat) Connect() error {
 	mp.conversationsCollection = conversationsCollection
 	mp.client = client
 	return nil
+}
+
+func (mp *MongoTextChat) PingDB() error {
+	return mp.client.Ping(context.TODO(), nil)
 }
 
 func (mp *MongoTextChat) CloseDB() {
@@ -133,7 +138,9 @@ func (mp *MongoTextChat) AddMessage(message *data.Message) error {
 		return err
 	}
 
-	// TODO: Verify if user exist
+	if !mp.validateUserExist(message.UserID){
+		return data.ErrorUserNotFound
+	}
 
 	message.ID = uuid.NewString()
 	// Adding time information to new message
@@ -150,9 +157,16 @@ func (mp *MongoTextChat) AddMessage(message *data.Message) error {
 	return nil
 }
 
-func (mp *MongoTextChat) AddConversation(conversation *data.Conversation) error {
-	// TODO: Verify if all user exists
-	// TODO: Veryfy if game exist
+func (mp *MongoTextChat) AddConversation(conversation *data.Conversation) (*data.Conversation, error) {
+	for _ , userID := range conversation.UserID {
+		if !mp.validateUserExist(userID){
+			return nil, data.ErrorUserNotFound
+		}
+	}
+
+	if !mp.validateGameExist(conversation.GameID){
+		return nil, data.ErrorGameNotFound
+	}
 
 	conversation.ID = uuid.NewString()
 	// Adding time information to new conversation
@@ -162,11 +176,12 @@ func (mp *MongoTextChat) AddConversation(conversation *data.Conversation) error 
 	// Inserting the new conversation into the database
 	insertResult, err := mp.conversationsCollection.InsertOne(context.TODO(), conversation)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Info("Inserting conversation", "Inserted ID", insertResult.InsertedID)
-	return nil
+
+	return conversation, nil
 }
 
 func (mp *MongoTextChat) DeleteMessage(id string) error {
@@ -195,4 +210,15 @@ func (mp *MongoTextChat) DeleteConversation(id string) error {
 
 	log.Info("Deleted documents in conversations collection", "delete_count", result.DeletedCount)
 	return nil
+}
+
+func (mp *MongoTextChat) validateUserExist(userID string) bool {
+	getUserByIDPath := data.MicroserviceUserPath + "/users/" + userID
+	resp, err := http.Get(getUserByIDPath)
+	return err == nil && resp.StatusCode == 200
+}
+
+func (mp *MongoTextChat) validateGameExist(gameID string) bool {
+	//Verify if game exist
+	return true
 }

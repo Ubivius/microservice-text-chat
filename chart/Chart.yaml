@@ -1,12 +1,12 @@
 apiVersion: v2
-name: microservice-template
+name: microservice-text-chat
 type: application
 version: 0.0.0
 appVersion: 0.0.0
-description: "microservice-template: Template for microservices."
+description: "microservice-text-chat: Text Chat microservices."
 icon: https://avatars.githubusercontent.com/u/64909001
 sources:
-  - https://github.com/Ubivius/microservice-template
+  - https://github.com/Ubivius/microservice-text-chat
 maintainers:
   - name: Ubivius
     email: ubivius@gmail.com

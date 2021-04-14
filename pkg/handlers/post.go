@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
@@ -16,10 +17,14 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 	case nil:
 		responseWriter.WriteHeader(http.StatusNoContent)
 		return
-	case data.ErrorConversationNotFound :
+	case data.ErrorConversationNotFound:
 		log.Error(err, "Conversation not found")
 		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
 		return
+	case data.ErrorUserNotFound:
+		log.Error(err, "UserID doesn't exist")
+		http.Error(responseWriter, "UserID doesn't exist", http.StatusBadRequest)
+		return	
 	default:
 		log.Error(err, "Error adding message")
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
@@ -32,11 +37,22 @@ func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.Resp
 	log.Info("AddConversation request")
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)
 
-	err := textChatHandler.db.AddConversation(conversation)
+	conversation, err := textChatHandler.db.AddConversation(conversation)
 
 	switch err {
 	case nil:
-		responseWriter.WriteHeader(http.StatusNoContent)
+		err = json.NewEncoder(responseWriter).Encode(conversation)
+		if err != nil {
+			log.Error(err, "Error serializing conversation")
+		}
+		return
+	case data.ErrorUserNotFound:
+		log.Error(err, "A UserID doesn't exist")
+		http.Error(responseWriter, "A UserID doesn't exist", http.StatusBadRequest)
+		return
+	case data.ErrorGameNotFound:
+		log.Error(err, "GameID doesn't exist")
+		http.Error(responseWriter, "GameID doesn't exist", http.StatusBadRequest)
 		return
 	default:
 		log.Error(err, "Error adding conversation")
