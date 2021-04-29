@@ -1,4 +1,4 @@
-# microservice-text-chat
+# Microservice-Text-Chat
 Text chat microservice for our online game framework.
 
 ## Text chat endpoints
