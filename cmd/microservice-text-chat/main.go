@@ -67,9 +67,17 @@ func main() {
 	// DB connection shutdown
 	db.CloseDB()
 
-	// Server shutdown
-	timeoutContext, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	// Context cancelling
+	timeoutContext, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// Cleanly shutdown and flush telemetry on shutdown
+	defer func(ctx context.Context) {
+		if err := tp.Shutdown(ctx); err != nil {
+			log.Error(err, "Error shutting down tracer provider")
+		}
+	}(timeoutContext)
+
+	// Server shutdown
 	_ = server.Shutdown(timeoutContext)
 }
