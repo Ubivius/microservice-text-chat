@@ -12,6 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
 )
 
 // ErrorEnvVar : Environment variable error
@@ -38,7 +39,9 @@ func (mp *MongoTextChat) Connect() error {
 	uri := mongodbURI()
 
 	// Setting client options
-	clientOptions := options.Client().ApplyURI(uri)
+	opts := options.Client()
+	clientOptions := opts.ApplyURI(uri)
+	opts.Monitor = otelmongo.NewMonitor()
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -144,7 +147,7 @@ func (mp *MongoTextChat) AddMessage(message *data.Message) error {
 		return err
 	}
 
-	if !mp.validateUserExist(message.UserID){
+	if !mp.validateUserExist(message.UserID) {
 		return data.ErrorUserNotFound
 	}
 
@@ -164,13 +167,13 @@ func (mp *MongoTextChat) AddMessage(message *data.Message) error {
 }
 
 func (mp *MongoTextChat) AddConversation(conversation *data.Conversation) (*data.Conversation, error) {
-	for _ , userID := range conversation.UserID {
-		if !mp.validateUserExist(userID){
+	for _, userID := range conversation.UserID {
+		if !mp.validateUserExist(userID) {
 			return nil, data.ErrorUserNotFound
 		}
 	}
 
-	if !mp.validateGameExist(conversation.GameID){
+	if !mp.validateGameExist(conversation.GameID) {
 		return nil, data.ErrorGameNotFound
 	}
 
@@ -229,7 +232,7 @@ func (mp *MongoTextChat) validateGameExist(gameID string) bool {
 	return true
 }
 
-func mongodbURI() string { 
+func mongodbURI() string {
 	hostname := os.Getenv("DB_HOSTNAME")
 	port := os.Getenv("DB_PORT")
 	username := os.Getenv("DB_USERNAME")
