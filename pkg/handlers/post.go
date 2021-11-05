@@ -12,7 +12,7 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 	log.Info("AddMessage request")
 	message := request.Context().Value(KeyMessage{}).(*data.Message)
 
-	err := textChatHandler.db.AddMessage(message)
+	err := textChatHandler.db.AddMessage(request.Context(), message)
 	switch err {
 	case nil:
 		responseWriter.WriteHeader(http.StatusNoContent)
@@ -24,7 +24,7 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 	case data.ErrorUserNotFound:
 		log.Error(err, "UserID doesn't exist")
 		http.Error(responseWriter, "UserID doesn't exist", http.StatusBadRequest)
-		return	
+		return
 	default:
 		log.Error(err, "Error adding message")
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
@@ -37,7 +37,7 @@ func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.Resp
 	log.Info("AddConversation request")
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)
 
-	conversation, err := textChatHandler.db.AddConversation(conversation)
+	conversation, err := textChatHandler.db.AddConversation(request.Context(), conversation)
 
 	switch err {
 	case nil:
