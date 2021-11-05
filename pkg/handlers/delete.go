@@ -4,10 +4,13 @@ import (
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
+	"go.opentelemetry.io/otel"
 )
 
 // Delete a message with specified id from the database
 func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "deleteMessage")
+	defer span.End()
 	id := getTextChatID(request)
 	log.Info("Delete message by ID request", "id", id)
 
@@ -30,6 +33,8 @@ func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.Respon
 
 // Delete a conversation with specified id from the database
 func (textChatHandler *TextChatHandler) DeleteConversation(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "deleteConversation")
+	defer span.End()
 	id := getTextChatID(request)
 	log.Info("Delete conversation by ID request", "id", id)
 

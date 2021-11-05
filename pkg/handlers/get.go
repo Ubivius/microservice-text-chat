@@ -5,9 +5,12 @@ import (
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
+	"go.opentelemetry.io/otel"
 )
 
 func (textChatHandler *TextChatHandler) GetMessageByID(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "getMessageById")
+	defer span.End()
 	id := getTextChatID(request)
 
 	log.Info("GetMessageByID request for ID", "id", id)
@@ -32,6 +35,8 @@ func (textChatHandler *TextChatHandler) GetMessageByID(responseWriter http.Respo
 }
 
 func (textChatHandler *TextChatHandler) GetConversationByID(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "getConversationById")
+	defer span.End()
 	id := getTextChatID(request)
 
 	log.Info("GetConversationByID request for ID", "id", id)
@@ -56,6 +61,8 @@ func (textChatHandler *TextChatHandler) GetConversationByID(responseWriter http.
 }
 
 func (textChatHandler *TextChatHandler) GetMessagesByConversationID(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "getMessagesByConversationId")
+	defer span.End()
 	id := getTextChatID(request)
 
 	log.Info("GetMessagesByConversationID request for conversationID", "id", id)

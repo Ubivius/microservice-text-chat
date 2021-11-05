@@ -5,10 +5,13 @@ import (
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
+	"go.opentelemetry.io/otel"
 )
 
 // AddMessage creates a new message from the received JSON
 func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "addMessage")
+	defer span.End()
 	log.Info("AddMessage request")
 	message := request.Context().Value(KeyMessage{}).(*data.Message)
 
@@ -34,6 +37,8 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 
 // AddConversation creates a new message from the received JSON
 func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "addConversation")
+	defer span.End()
 	log.Info("AddConversation request")
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)
 
