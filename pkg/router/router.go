@@ -13,7 +13,7 @@ import (
 func New(textChatHandler *handlers.TextChatHandler) *mux.Router {
 	log.Info("Starting router")
 	router := mux.NewRouter()
-	router.Use(otelmux.Middleware("achievements"))
+	router.Use(otelmux.Middleware("text-chat"))
 	router.Use(metrics.RequestCountMiddleware)
 
 	// Get Router
