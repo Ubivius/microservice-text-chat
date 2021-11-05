@@ -11,6 +11,8 @@ import (
 	"github.com/Ubivius/microservice-text-chat/pkg/database"
 	"github.com/Ubivius/microservice-text-chat/pkg/handlers"
 	"github.com/Ubivius/microservice-text-chat/pkg/router"
+	"github.com/Ubivius/pkg-telemetry/metrics"
+	"github.com/Ubivius/pkg-telemetry/tracing"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
@@ -23,6 +25,12 @@ func main() {
 	opts.BindFlags(flag.CommandLine)
 	newLogger := zap.New(zap.UseFlagOptions(&opts), zap.WriteTo(os.Stdout))
 	logf.SetLogger(newLogger.WithName("log"))
+
+	// Starting tracer provider
+	tp := tracing.CreateTracerProvider("http://192.168.6.12:14268/api/traces", "microservice-text-chat-traces")
+
+	// Starting metrics exporter
+	metrics.StartPrometheusExporterWithName("text-chat")
 
 	// Database init
 	db := database.NewMongoTextChat()
