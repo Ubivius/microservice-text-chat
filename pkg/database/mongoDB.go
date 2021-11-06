@@ -232,7 +232,7 @@ func (mp *MongoTextChat) validateGameExist(gameID string) bool {
 	return true
 }
 
-func deleteAllFromMongoDB() error {
+func deleteAllConversationsAndMessagesFromMongoDB() (error, error) {
 	uri := mongodbURI()
 
 	// Setting client options
@@ -241,11 +241,14 @@ func deleteAllFromMongoDB() error {
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil || client == nil {
 		log.Error(err, "Failed to connect to database. Failing test")
-		return err
+		return err, nil
 	}
-	collection := client.Database("ubivius").Collection("products")
-	_, err = collection.DeleteMany(context.Background(), bson.D{{}})
-	return err
+	messagesCollection := client.Database("ubivius").Collection("messages")
+	conversationsCollection := client.Database("ubivius").Collection("conversations")
+
+	_, err1 := messagesCollection.DeleteMany(context.Background(), bson.D{{}})
+	_, err2 := conversationsCollection.DeleteMany(context.Background(), bson.D{{}})
+	return err1, err2
 }
 
 func mongodbURI() string {
