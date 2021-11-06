@@ -2,10 +2,33 @@ package database
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
 )
+
+func integrationTestSetup(t *testing.T) {
+	t.Log("Test setup")
+
+	if os.Getenv("DB_USERNAME") == "" {
+		os.Setenv("DB_USERNAME", "admin")
+	}
+	if os.Getenv("DB_PASSWORD") == "" {
+		os.Setenv("DB_PASSWORD", "pass")
+	}
+	if os.Getenv("DB_PORT") == "" {
+		os.Setenv("DB_PORT", "27888")
+	}
+	if os.Getenv("DB_HOSTNAME") == "" {
+		os.Setenv("DB_HOSTNAME", "localhost")
+	}
+
+	err1, err2 := deleteAllConversationsAndMessagesFromMongoDB()
+	if err1 != nil || err2 != nil {
+		t.Errorf("Failed to delete existing items from database during setup")
+	}
+}
 
 func TestMongoDBConnectionAndShutdownIntegration(t *testing.T) {
 	if testing.Short() {
