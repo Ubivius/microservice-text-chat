@@ -1,10 +1,12 @@
 package database
 
 import (
+	"context"
 	"time"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 )
 
 type MockTextChat struct {
@@ -27,7 +29,9 @@ func (mp *MockTextChat) CloseDB() {
 	log.Info("Mocked DB connection closed")
 }
 
-func (mp *MockTextChat) GetMessageByID(id string) (*data.Message, error) {
+func (mp *MockTextChat) GetMessageByID(ctx context.Context, id string) (*data.Message, error) {
+	_, span := otel.Tracer("text-chat").Start(ctx, "getMessageByIdDatabase")
+	defer span.End()
 	index := findIndexByMessageID(id)
 	if index == -1 {
 		return nil, data.ErrorMessageNotFound
@@ -35,7 +39,9 @@ func (mp *MockTextChat) GetMessageByID(id string) (*data.Message, error) {
 	return messageList[index], nil
 }
 
-func (mp *MockTextChat) GetMessagesByConversationID(id string) (data.Messages, error) {
+func (mp *MockTextChat) GetMessagesByConversationID(ctx context.Context, id string) (data.Messages, error) {
+	_, span := otel.Tracer("text-chat").Start(ctx, "getMessagesByConversationIdDatabase")
+	defer span.End()
 	var messages data.Messages
 	for _, v := range messageList {
 		if v.ConversationID == id {
@@ -48,7 +54,9 @@ func (mp *MockTextChat) GetMessagesByConversationID(id string) (data.Messages, e
 	return messages, nil
 }
 
-func (mp *MockTextChat) GetConversationByID(id string) (*data.Conversation, error) {
+func (mp *MockTextChat) GetConversationByID(ctx context.Context, id string) (*data.Conversation, error) {
+	_, span := otel.Tracer("text-chat").Start(ctx, "getConversationByIdDatabase")
+	defer span.End()
 	index := findIndexByConversationID(id)
 	if index == -1 {
 		return nil, data.ErrorConversationNotFound
@@ -56,13 +64,15 @@ func (mp *MockTextChat) GetConversationByID(id string) (*data.Conversation, erro
 	return conversationList[index], nil
 }
 
-func (mp *MockTextChat) AddMessage(message *data.Message) error {
-	_, err := mp.GetConversationByID(message.ConversationID)
+func (mp *MockTextChat) AddMessage(ctx context.Context, message *data.Message) error {
+	_, span := otel.Tracer("text-chat").Start(ctx, "addMessageDatabase")
+	defer span.End()
+	_, err := mp.GetConversationByID(ctx, message.ConversationID)
 	if err != nil {
 		return err
 	}
 
-	if !mp.validateUserExist(message.UserID){
+	if !mp.validateUserExist(message.UserID) {
 		return data.ErrorUserNotFound
 	}
 
@@ -71,14 +81,16 @@ func (mp *MockTextChat) AddMessage(message *data.Message) error {
 	return nil
 }
 
-func (mp *MockTextChat) AddConversation(conversation *data.Conversation) (*data.Conversation, error) {
-	for _ , userID := range conversation.UserID {
-		if !mp.validateUserExist(userID){
+func (mp *MockTextChat) AddConversation(ctx context.Context, conversation *data.Conversation) (*data.Conversation, error) {
+	_, span := otel.Tracer("text-chat").Start(ctx, "addConversationDatabase")
+	defer span.End()
+	for _, userID := range conversation.UserID {
+		if !mp.validateUserExist(userID) {
 			return nil, data.ErrorUserNotFound
 		}
 	}
 
-	if !mp.validateGameExist(conversation.GameID){
+	if !mp.validateGameExist(conversation.GameID) {
 		return nil, data.ErrorGameNotFound
 	}
 
@@ -87,7 +99,9 @@ func (mp *MockTextChat) AddConversation(conversation *data.Conversation) (*data.
 	return conversation, nil
 }
 
-func (mp *MockTextChat) DeleteMessage(id string) error {
+func (mp *MockTextChat) DeleteMessage(ctx context.Context, id string) error {
+	_, span := otel.Tracer("text-chat").Start(ctx, "deleteMessageDatabase")
+	defer span.End()
 	index := findIndexByMessageID(id)
 	if index == -1 {
 		return data.ErrorMessageNotFound
@@ -98,7 +112,9 @@ func (mp *MockTextChat) DeleteMessage(id string) error {
 	return nil
 }
 
-func (mp *MockTextChat) DeleteConversation(id string) error {
+func (mp *MockTextChat) DeleteConversation(ctx context.Context, id string) error {
+	_, span := otel.Tracer("text-chat").Start(ctx, "deleteConversationDatabase")
+	defer span.End()
 	index := findIndexByConversationID(id)
 	if index == -1 {
 		return data.ErrorConversationNotFound

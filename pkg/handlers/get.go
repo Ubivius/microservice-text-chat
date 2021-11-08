@@ -5,14 +5,17 @@ import (
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
+	"go.opentelemetry.io/otel"
 )
 
 func (textChatHandler *TextChatHandler) GetMessageByID(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "getMessageById")
+	defer span.End()
 	id := getTextChatID(request)
 
-	log.Info("GetMessageByID request for ID","id", id)
+	log.Info("GetMessageByID request for ID", "id", id)
 
-	message, err := textChatHandler.db.GetMessageByID(id)
+	message, err := textChatHandler.db.GetMessageByID(request.Context(), id)
 	switch err {
 	case nil:
 		err = json.NewEncoder(responseWriter).Encode(message)
@@ -32,11 +35,13 @@ func (textChatHandler *TextChatHandler) GetMessageByID(responseWriter http.Respo
 }
 
 func (textChatHandler *TextChatHandler) GetConversationByID(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "getConversationById")
+	defer span.End()
 	id := getTextChatID(request)
 
-	log.Info("GetConversationByID request for ID","id", id)
+	log.Info("GetConversationByID request for ID", "id", id)
 
-	conversation, err := textChatHandler.db.GetConversationByID(id)
+	conversation, err := textChatHandler.db.GetConversationByID(request.Context(), id)
 	switch err {
 	case nil:
 		err = json.NewEncoder(responseWriter).Encode(conversation)
@@ -56,11 +61,13 @@ func (textChatHandler *TextChatHandler) GetConversationByID(responseWriter http.
 }
 
 func (textChatHandler *TextChatHandler) GetMessagesByConversationID(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "getMessagesByConversationId")
+	defer span.End()
 	id := getTextChatID(request)
 
-	log.Info("GetMessagesByConversationID request for conversationID","id", id)
+	log.Info("GetMessagesByConversationID request for conversationID", "id", id)
 
-	messages, err := textChatHandler.db.GetMessagesByConversationID(id)
+	messages, err := textChatHandler.db.GetMessagesByConversationID(request.Context(), id)
 	switch err {
 	case nil:
 		err = json.NewEncoder(responseWriter).Encode(messages)

@@ -4,20 +4,23 @@ import (
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
+	"go.opentelemetry.io/otel"
 )
 
 // Delete a message with specified id from the database
 func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "deleteMessage")
+	defer span.End()
 	id := getTextChatID(request)
 	log.Info("Delete message by ID request", "id", id)
 
-	err := textChatHandler.db.DeleteMessage(id)
+	err := textChatHandler.db.DeleteMessage(request.Context(), id)
 
 	switch err {
 	case nil:
 		responseWriter.WriteHeader(http.StatusNoContent)
 		return
-	case data.ErrorMessageNotFound :
+	case data.ErrorMessageNotFound:
 		log.Error(err, "Error deleting message, id does not exist")
 		http.Error(responseWriter, "Message not found", http.StatusNotFound)
 		return
@@ -30,18 +33,20 @@ func (textChatHandler *TextChatHandler) DeleteMessage(responseWriter http.Respon
 
 // Delete a conversation with specified id from the database
 func (textChatHandler *TextChatHandler) DeleteConversation(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "deleteConversation")
+	defer span.End()
 	id := getTextChatID(request)
 	log.Info("Delete conversation by ID request", "id", id)
 
 	// TODO: Delete all messages from the conversation
 
-	err := textChatHandler.db.DeleteConversation(id)
+	err := textChatHandler.db.DeleteConversation(request.Context(), id)
 
 	switch err {
 	case nil:
 		responseWriter.WriteHeader(http.StatusNoContent)
 		return
-	case data.ErrorConversationNotFound :
+	case data.ErrorConversationNotFound:
 		log.Error(err, "Error deleting conversation, id does not exist")
 		http.Error(responseWriter, "Conversation not found", http.StatusNotFound)
 		return

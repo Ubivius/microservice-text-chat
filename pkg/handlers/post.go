@@ -5,14 +5,17 @@ import (
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
+	"go.opentelemetry.io/otel"
 )
 
 // AddMessage creates a new message from the received JSON
 func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "addMessage")
+	defer span.End()
 	log.Info("AddMessage request")
 	message := request.Context().Value(KeyMessage{}).(*data.Message)
 
-	err := textChatHandler.db.AddMessage(message)
+	err := textChatHandler.db.AddMessage(request.Context(), message)
 	switch err {
 	case nil:
 		responseWriter.WriteHeader(http.StatusNoContent)
@@ -24,7 +27,7 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 	case data.ErrorUserNotFound:
 		log.Error(err, "UserID doesn't exist")
 		http.Error(responseWriter, "UserID doesn't exist", http.StatusBadRequest)
-		return	
+		return
 	default:
 		log.Error(err, "Error adding message")
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
@@ -34,10 +37,12 @@ func (textChatHandler *TextChatHandler) AddMessage(responseWriter http.ResponseW
 
 // AddConversation creates a new message from the received JSON
 func (textChatHandler *TextChatHandler) AddConversation(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("text-chat").Start(request.Context(), "addConversation")
+	defer span.End()
 	log.Info("AddConversation request")
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)
 
-	conversation, err := textChatHandler.db.AddConversation(conversation)
+	conversation, err := textChatHandler.db.AddConversation(request.Context(), conversation)
 
 	switch err {
 	case nil:

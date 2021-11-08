@@ -12,6 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
 )
 
 // ErrorEnvVar : Environment variable error
@@ -38,17 +39,19 @@ func (mp *MongoTextChat) Connect() error {
 	uri := mongodbURI()
 
 	// Setting client options
-	clientOptions := options.Client().ApplyURI(uri)
+	opts := options.Client()
+	clientOptions := opts.ApplyURI(uri)
+	opts.Monitor = otelmongo.NewMonitor()
 
 	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil || client == nil {
 		log.Error(err, "Failed to connect to database. Shutting down service")
 		os.Exit(1)
 	}
 
 	// Ping DB
-	err = client.Ping(context.TODO(), nil)
+	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		log.Error(err, "Failed to ping database. Shutting down service")
 		os.Exit(1)
@@ -67,17 +70,17 @@ func (mp *MongoTextChat) Connect() error {
 }
 
 func (mp *MongoTextChat) PingDB() error {
-	return mp.client.Ping(context.TODO(), nil)
+	return mp.client.Ping(context.Background(), nil)
 }
 
 func (mp *MongoTextChat) CloseDB() {
-	err := mp.client.Disconnect(context.TODO())
+	err := mp.client.Disconnect(context.Background())
 	if err != nil {
 		log.Error(err, "Error while disconnecting from database")
 	}
 }
 
-func (mp *MongoTextChat) GetMessageByID(id string) (*data.Message, error) {
+func (mp *MongoTextChat) GetMessageByID(ctx context.Context, id string) (*data.Message, error) {
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: id}}
 
@@ -85,13 +88,13 @@ func (mp *MongoTextChat) GetMessageByID(id string) (*data.Message, error) {
 	var result data.Message
 
 	// Find a single matching item from the database
-	err := mp.messagesCollection.FindOne(context.TODO(), filter).Decode(&result)
+	err := mp.messagesCollection.FindOne(ctx, filter).Decode(&result)
 
 	// Parse result into the returned message
 	return &result, err
 }
 
-func (mp *MongoTextChat) GetConversationByID(id string) (*data.Conversation, error) {
+func (mp *MongoTextChat) GetConversationByID(ctx context.Context, id string) (*data.Conversation, error) {
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: id}}
 
@@ -99,13 +102,13 @@ func (mp *MongoTextChat) GetConversationByID(id string) (*data.Conversation, err
 	var result data.Conversation
 
 	// Find a single matching item from the database
-	err := mp.conversationsCollection.FindOne(context.TODO(), filter).Decode(&result)
+	err := mp.conversationsCollection.FindOne(ctx, filter).Decode(&result)
 
 	// Parse result into the returned conversation
 	return &result, err
 }
 
-func (mp *MongoTextChat) GetMessagesByConversationID(id string) (data.Messages, error) {
+func (mp *MongoTextChat) GetMessagesByConversationID(ctx context.Context, id string) (data.Messages, error) {
 	// MongoDB search filter
 	filter := bson.D{{Key: "conversation_id", Value: id}}
 
@@ -113,13 +116,13 @@ func (mp *MongoTextChat) GetMessagesByConversationID(id string) (data.Messages, 
 	var messages data.Messages
 
 	// Find returns a cursor that must be iterated through
-	cursor, err := mp.messagesCollection.Find(context.TODO(), filter)
+	cursor, err := mp.messagesCollection.Find(ctx, filter)
 	if err != nil {
 		log.Error(err, "Error getting messages by conversationID from database")
 	}
 
 	// Iterating through cursor
-	for cursor.Next(context.TODO()) {
+	for cursor.Next(ctx) {
 		var result data.Message
 		err := cursor.Decode(&result)
 		if err != nil {
@@ -133,18 +136,18 @@ func (mp *MongoTextChat) GetMessagesByConversationID(id string) (data.Messages, 
 	}
 
 	// Close the cursor once finished
-	cursor.Close(context.TODO())
+	cursor.Close(ctx)
 
 	return messages, err
 }
 
-func (mp *MongoTextChat) AddMessage(message *data.Message) error {
-	_, err := mp.GetConversationByID(message.ConversationID)
+func (mp *MongoTextChat) AddMessage(ctx context.Context, message *data.Message) error {
+	_, err := mp.GetConversationByID(ctx, message.ConversationID)
 	if err != nil {
 		return err
 	}
 
-	if !mp.validateUserExist(message.UserID){
+	if !mp.validateUserExist(message.UserID) {
 		return data.ErrorUserNotFound
 	}
 
@@ -154,7 +157,7 @@ func (mp *MongoTextChat) AddMessage(message *data.Message) error {
 	message.UpdatedOn = time.Now().UTC().String()
 
 	// Inserting the new message into the database
-	insertResult, err := mp.messagesCollection.InsertOne(context.TODO(), message)
+	insertResult, err := mp.messagesCollection.InsertOne(ctx, message)
 	if err != nil {
 		return err
 	}
@@ -163,14 +166,14 @@ func (mp *MongoTextChat) AddMessage(message *data.Message) error {
 	return nil
 }
 
-func (mp *MongoTextChat) AddConversation(conversation *data.Conversation) (*data.Conversation, error) {
-	for _ , userID := range conversation.UserID {
-		if !mp.validateUserExist(userID){
+func (mp *MongoTextChat) AddConversation(ctx context.Context, conversation *data.Conversation) (*data.Conversation, error) {
+	for _, userID := range conversation.UserID {
+		if !mp.validateUserExist(userID) {
 			return nil, data.ErrorUserNotFound
 		}
 	}
 
-	if !mp.validateGameExist(conversation.GameID){
+	if !mp.validateGameExist(conversation.GameID) {
 		return nil, data.ErrorGameNotFound
 	}
 
@@ -180,7 +183,7 @@ func (mp *MongoTextChat) AddConversation(conversation *data.Conversation) (*data
 	conversation.UpdatedOn = time.Now().UTC().String()
 
 	// Inserting the new conversation into the database
-	insertResult, err := mp.conversationsCollection.InsertOne(context.TODO(), conversation)
+	insertResult, err := mp.conversationsCollection.InsertOne(ctx, conversation)
 	if err != nil {
 		return nil, err
 	}
@@ -190,12 +193,12 @@ func (mp *MongoTextChat) AddConversation(conversation *data.Conversation) (*data
 	return conversation, nil
 }
 
-func (mp *MongoTextChat) DeleteMessage(id string) error {
+func (mp *MongoTextChat) DeleteMessage(ctx context.Context, id string) error {
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: id}}
 
 	// Delete a single item matching the filter
-	result, err := mp.messagesCollection.DeleteOne(context.TODO(), filter)
+	result, err := mp.messagesCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Error(err, "Error deleting message")
 	}
@@ -204,12 +207,12 @@ func (mp *MongoTextChat) DeleteMessage(id string) error {
 	return nil
 }
 
-func (mp *MongoTextChat) DeleteConversation(id string) error {
+func (mp *MongoTextChat) DeleteConversation(ctx context.Context, id string) error {
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: id}}
 
 	// Delete a single item matching the filter
-	result, err := mp.conversationsCollection.DeleteOne(context.TODO(), filter)
+	result, err := mp.conversationsCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Error(err, "Error deleting conversation")
 	}
@@ -229,7 +232,26 @@ func (mp *MongoTextChat) validateGameExist(gameID string) bool {
 	return true
 }
 
-func mongodbURI() string { 
+func deleteAllConversationsAndMessagesFromMongoDB() (error, error) {
+	uri := mongodbURI()
+
+	// Setting client options
+	opts := options.Client()
+	clientOptions := opts.ApplyURI(uri)
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil || client == nil {
+		log.Error(err, "Failed to connect to database. Failing test")
+		return err, nil
+	}
+	messagesCollection := client.Database("ubivius").Collection("messages")
+	conversationsCollection := client.Database("ubivius").Collection("conversations")
+
+	_, err1 := messagesCollection.DeleteMany(context.Background(), bson.D{{}})
+	_, err2 := conversationsCollection.DeleteMany(context.Background(), bson.D{{}})
+	return err1, err2
+}
+
+func mongodbURI() string {
 	hostname := os.Getenv("DB_HOSTNAME")
 	port := os.Getenv("DB_PORT")
 	username := os.Getenv("DB_USERNAME")
