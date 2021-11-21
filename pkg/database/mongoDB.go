@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
+	"go.opentelemetry.io/otel"
 )
 
 // ErrorEnvVar : Environment variable error
@@ -219,6 +220,22 @@ func (mp *MongoTextChat) DeleteConversation(ctx context.Context, id string) erro
 
 	log.Info("Deleted documents in conversations collection", "delete_count", result.DeletedCount)
 	return nil
+}
+
+func (mp *MongoTextChat) AddUserToConversation(ctx context.Context, conversation *data.Conversation) (*data.Conversation, error) {
+	_, span := otel.Tracer("text-chat").Start(ctx, "addUserToConversationTextChat")
+	defer span.End()
+	for _, userID := range conversation.UserID {
+		if !mp.validateUserExist(userID) {
+			return nil, data.ErrorUserNotFound
+		}
+	}
+
+	if !mp.validateGameExist(conversation.GameID) {
+		return nil, data.ErrorGameNotFound
+	}
+
+	return conversation, nil
 }
 
 func (mp *MongoTextChat) validateUserExist(userID string) bool {

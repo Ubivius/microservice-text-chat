@@ -32,6 +32,15 @@ __Data Params__
 }
 ```
 
+`PUT` `/conversations` Add new or remove users from a conversation. </br>
+__Data Params__
+```json
+{
+  "user_id": ["string, required"],
+  "game_id": "string, required",
+}
+```
+
 `DELETE` `/messages/{id}` Delete a message.  `id=[string]`
 
 `DELETE` `/conversations/{id}` Delete a conversation and all associated messages.  `id=[string]`

@@ -41,5 +41,10 @@ func New(textChatHandler *handlers.TextChatHandler) *mux.Router {
 	deleteRouter.HandleFunc("/messages/{id:[0-9a-z-]+}", textChatHandler.DeleteMessage)
 	deleteRouter.HandleFunc("/conversations/{id:[0-9a-z-]+}", textChatHandler.DeleteConversation)
 
+	// Conversation put router
+	conversationPutRouter := router.Methods(http.MethodPut).Subrouter()
+	conversationPutRouter.HandleFunc("/conversations", textChatHandler.AddUserToConversation)
+	conversationPutRouter.Use(textChatHandler.MiddlewareConversationValidation)
+
 	return router
 }
