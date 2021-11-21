@@ -250,3 +250,33 @@ func TestDeleteExistingConversation(t *testing.T) {
 		t.Errorf("Expected status code %d but got : %d", http.StatusNoContent, response.Code)
 	}
 }
+
+func TestAddUserToExistingConversation(t *testing.T) {
+	// Creating request body
+	body := &data.Conversation{
+		ID: "e2382ea2-b5fa-4506-aa9d-d338aa52af44",
+		UserID: []string{"a2181017-5c53-422b-b6bc-036b27c04fc8",
+			"2aee2975-6b76-4340-b679-e81661b1cdb5",
+			"3a1c152e-f172-41de-a5ab-ca21f6573bf3",
+			"c6e6a2b2-bd25-4151-ace1-611accc15a50",
+			"newUser"},
+		GameID: "a2181017-5c53-422b-b6bc-036b27c04fc8",
+	}
+
+	request := httptest.NewRequest(http.MethodPut, "/conversations", nil)
+	response := httptest.NewRecorder()
+
+	// Add the body to the context since we arent passing through middleware
+	ctx := context.WithValue(request.Context(), KeyConversation{}, body)
+	request = request.WithContext(ctx)
+
+	textChatHandler := NewTextChatHandler(newTextChatDB())
+	textChatHandler.AddUserToConversation(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Errorf("Expected status code %d, but got %d", http.StatusOK, response.Code)
+	}
+	if !strings.Contains(response.Body.String(), "newUser") {
+		t.Error("Missing elements from expected results")
+	}
+}
