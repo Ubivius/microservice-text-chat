@@ -235,6 +235,17 @@ func (mp *MongoTextChat) AddUserToConversation(ctx context.Context, conversation
 		return nil, data.ErrorGameNotFound
 	}
 
+	conversation.UpdatedOn = time.Now().UTC().String()
+	// MongoDB search filter
+	filter := bson.D{{Key: "_id", Value: conversation.ID}}
+	update := bson.M{"$set": conversation}
+
+	// Update a single item in the database with the values in update that match the filter
+	_, err := mp.conversationsCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Error(err, "Error updating conversation.")
+	}
+
 	return conversation, nil
 }
 
