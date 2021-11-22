@@ -36,6 +36,7 @@ __Data Params__
 __Data Params__
 ```json
 {
+  "id": "string, required",
   "user_id": ["string, required"],
   "game_id": "string, required",
 }
