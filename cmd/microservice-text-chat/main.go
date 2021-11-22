@@ -33,7 +33,7 @@ func main() {
 	metrics.StartPrometheusExporterWithName("text-chat")
 
 	// Database init
-	db := database.NewMockTextChat()
+	db := database.NewMongoTextChat()
 
 	// Creating handlers
 	textChatHandler := handlers.NewTextChatHandler(db)
