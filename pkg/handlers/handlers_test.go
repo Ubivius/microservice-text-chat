@@ -273,10 +273,7 @@ func TestAddUserToExistingConversation(t *testing.T) {
 	textChatHandler := NewTextChatHandler(newTextChatDB())
 	textChatHandler.AddUserToConversation(response, request)
 
-	if response.Code != http.StatusOK {
-		t.Errorf("Expected status code %d, but got %d", http.StatusOK, response.Code)
-	}
-	if !strings.Contains(response.Body.String(), "newUser") {
-		t.Error("Missing elements from expected results")
+	if response.Code != http.StatusNoContent {
+		t.Errorf("Expected status code %d, but got %d", http.StatusNoContent, response.Code)
 	}
 }

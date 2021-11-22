@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/Ubivius/microservice-text-chat/pkg/data"
@@ -15,14 +14,11 @@ func (textChatHandler *TextChatHandler) AddUserToConversation(responseWriter htt
 	log.Info("Add User to Conversation request")
 	conversation := request.Context().Value(KeyConversation{}).(*data.Conversation)
 
-	conversation, err := textChatHandler.db.AddConversation(request.Context(), conversation)
+	err := textChatHandler.db.AddUserToConversation(request.Context(), conversation)
 
 	switch err {
 	case nil:
-		err = json.NewEncoder(responseWriter).Encode(conversation)
-		if err != nil {
-			log.Error(err, "Error serializing conversation")
-		}
+		responseWriter.WriteHeader(http.StatusNoContent)
 		return
 	case data.ErrorUserNotFound:
 		log.Error(err, "A UserID doesn't exist")

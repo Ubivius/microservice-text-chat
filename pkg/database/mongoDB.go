@@ -222,17 +222,17 @@ func (mp *MongoTextChat) DeleteConversation(ctx context.Context, id string) erro
 	return nil
 }
 
-func (mp *MongoTextChat) AddUserToConversation(ctx context.Context, conversation *data.Conversation) (*data.Conversation, error) {
+func (mp *MongoTextChat) AddUserToConversation(ctx context.Context, conversation *data.Conversation) error {
 	_, span := otel.Tracer("text-chat").Start(ctx, "addUserToConversationTextChat")
 	defer span.End()
 	for _, userID := range conversation.UserID {
 		if !mp.validateUserExist(userID) {
-			return nil, data.ErrorUserNotFound
+			return data.ErrorUserNotFound
 		}
 	}
 
 	if !mp.validateGameExist(conversation.GameID) {
-		return nil, data.ErrorGameNotFound
+		return data.ErrorGameNotFound
 	}
 
 	conversation.UpdatedOn = time.Now().UTC().String()
@@ -246,7 +246,7 @@ func (mp *MongoTextChat) AddUserToConversation(ctx context.Context, conversation
 		log.Error(err, "Error updating conversation.")
 	}
 
-	return conversation, nil
+	return nil
 }
 
 func (mp *MongoTextChat) validateUserExist(userID string) bool {
