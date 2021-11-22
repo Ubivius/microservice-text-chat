@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
+	"go.opentelemetry.io/otel"
 )
 
 // ErrorEnvVar : Environment variable error
@@ -218,6 +219,33 @@ func (mp *MongoTextChat) DeleteConversation(ctx context.Context, id string) erro
 	}
 
 	log.Info("Deleted documents in conversations collection", "delete_count", result.DeletedCount)
+	return nil
+}
+
+func (mp *MongoTextChat) AddUserToConversation(ctx context.Context, conversation *data.Conversation) error {
+	_, span := otel.Tracer("text-chat").Start(ctx, "addUserToConversationTextChat")
+	defer span.End()
+	for _, userID := range conversation.UserID {
+		if !mp.validateUserExist(userID) {
+			return data.ErrorUserNotFound
+		}
+	}
+
+	if !mp.validateGameExist(conversation.GameID) {
+		return data.ErrorGameNotFound
+	}
+
+	conversation.UpdatedOn = time.Now().UTC().String()
+	// MongoDB search filter
+	filter := bson.D{{Key: "_id", Value: conversation.ID}}
+	update := bson.M{"$set": conversation}
+
+	// Update a single item in the database with the values in update that match the filter
+	_, err := mp.conversationsCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Error(err, "Error updating conversation.")
+	}
+
 	return nil
 }
 

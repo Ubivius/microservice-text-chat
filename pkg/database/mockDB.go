@@ -126,6 +126,27 @@ func (mp *MockTextChat) DeleteConversation(ctx context.Context, id string) error
 	return nil
 }
 
+func (mp *MockTextChat) AddUserToConversation(ctx context.Context, conversation *data.Conversation) error {
+	_, span := otel.Tracer("text-chat").Start(ctx, "addUserToConversationTextChat")
+	defer span.End()
+	for _, userID := range conversation.UserID {
+		if !mp.validateUserExist(userID) {
+			return data.ErrorUserNotFound
+		}
+	}
+
+	if !mp.validateGameExist(conversation.GameID) {
+		return data.ErrorGameNotFound
+	}
+
+	conversationIndex := findIndexByConversationID(conversation.ID)
+	conversationToUpdate := conversationList[conversationIndex]
+	conversationToUpdate.UpdatedOn = time.Now().UTC().String()
+	conversationToUpdate.UserID = make([]string, len(conversation.UserID))
+	_ = copy(conversationToUpdate.UserID, conversation.UserID)
+	return nil
+}
+
 // Returns the index of a message in the database
 // Returns -1 when no message is found
 func findIndexByMessageID(id string) int {
