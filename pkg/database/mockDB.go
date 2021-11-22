@@ -142,6 +142,7 @@ func (mp *MockTextChat) AddUserToConversation(ctx context.Context, conversation 
 	conversationIndex := findIndexByConversationID(conversation.ID)
 	conversationToUpdate := conversationList[conversationIndex]
 	conversationToUpdate.UpdatedOn = time.Now().UTC().String()
+	conversationToUpdate.UserID = make([]string, len(conversation.UserID))
 	_ = copy(conversationToUpdate.UserID, conversation.UserID)
 	return nil
 }
