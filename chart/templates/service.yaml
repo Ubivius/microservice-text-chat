@@ -32,6 +32,12 @@ spec:
       protocol: TCP
       name: http
       targetPort: {{ .Values.service.targetPort }}
+{{- range .Values.service.otherPorts }}
+    - port: {{ .port }}
+      protocol: TCP
+      name: {{ .name }}
+      targetPort: {{ .targetPort }}
+{{- end }}
 {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.nodePort))) }}
       nodePort: {{ .Values.service.nodePort }}
 {{- end }}
