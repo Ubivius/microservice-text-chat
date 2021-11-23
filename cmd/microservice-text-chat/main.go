@@ -57,6 +57,23 @@ func main() {
 		}
 	}()
 
+	// Mux route that is only exposed internally for the game server
+	internalRouter := router.NewInternalRouter(textChatHandler)
+	internalServer := &http.Server{
+		Addr:        ":9091",
+		Handler:     internalRouter,
+		IdleTimeout: 120 * time.Second,
+		ReadTimeout: 1 * time.Second,
+	}
+
+	go func() {
+		log.Info("Starting internal server", "port", internalServer.Addr)
+		err := internalServer.ListenAndServe()
+		if err != nil {
+			log.Error(err, "Internal server error")
+		}
+	}()
+
 	// Handle shutdown signals from operating system
 	signalChannel := make(chan os.Signal, 1)
 	signal.Notify(signalChannel, os.Interrupt)
@@ -80,4 +97,5 @@ func main() {
 
 	// Server shutdown
 	_ = server.Shutdown(timeoutContext)
+	_ = internalServer.Shutdown(timeoutContext)
 }

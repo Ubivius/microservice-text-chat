@@ -80,6 +80,10 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 9090
+  otherPorts:
+    - port: 9091
+      name: internal-http
+      targetPort: 9091
 
 ingress:
   enabled: true
