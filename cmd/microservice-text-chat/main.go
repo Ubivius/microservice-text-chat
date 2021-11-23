@@ -41,9 +41,6 @@ func main() {
 	// Mux route handling with gorilla/mux
 	r := router.New(textChatHandler)
 
-	// Mux route that is only exposed internally for the game server
-	// internalRouter := router.NewInternalRouter()
-
 	// Server setup
 	server := &http.Server{
 		Addr:        ":9090",
@@ -57,6 +54,23 @@ func main() {
 		err := server.ListenAndServe()
 		if err != nil {
 			log.Error(err, "Server error")
+		}
+	}()
+
+	// Mux route that is only exposed internally for the game server
+	internalRouter := router.NewInternalRouter(textChatHandler)
+	internalServer := &http.Server{
+		Addr:        ":9091",
+		Handler:     internalRouter,
+		IdleTimeout: 120 * time.Second,
+		ReadTimeout: 1 * time.Second,
+	}
+
+	go func() {
+		log.Info("Starting internal server", "port", internalServer.Addr)
+		err := internalServer.ListenAndServe()
+		if err != nil {
+			log.Error(err, "Internal server error")
 		}
 	}()
 
@@ -83,4 +97,5 @@ func main() {
 
 	// Server shutdown
 	_ = server.Shutdown(timeoutContext)
+	_ = internalServer.Shutdown(timeoutContext)
 }
