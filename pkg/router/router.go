@@ -48,3 +48,22 @@ func New(textChatHandler *handlers.TextChatHandler) *mux.Router {
 
 	return router
 }
+
+func NewInternalRouter(textChatHandler *handlers.TextChatHandler) *mux.Router {
+	log.Info("Starting router")
+	router := mux.NewRouter()
+	router.Use(otelmux.Middleware("text-chat"))
+	router.Use(metrics.RequestCountMiddleware)
+
+	// Conversation post router
+	conversationPostRouter := router.Methods(http.MethodPost).Subrouter()
+	conversationPostRouter.HandleFunc("/conversations", textChatHandler.AddConversation)
+	conversationPostRouter.Use(textChatHandler.MiddlewareConversationValidation)
+
+	// Conversation put router
+	conversationPutRouter := router.Methods(http.MethodPut).Subrouter()
+	conversationPutRouter.HandleFunc("/conversations", textChatHandler.AddUserToConversation)
+	conversationPutRouter.Use(textChatHandler.MiddlewareConversationValidation)
+
+	return router
+}

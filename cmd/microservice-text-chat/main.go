@@ -41,6 +41,9 @@ func main() {
 	// Mux route handling with gorilla/mux
 	r := router.New(textChatHandler)
 
+	// Mux route that is only exposed internally for the game server
+	// internalRouter := router.NewInternalRouter()
+
 	// Server setup
 	server := &http.Server{
 		Addr:        ":9090",
