@@ -1,3 +1,4 @@
+{{- $svcType := .Values.service.type -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -38,7 +39,7 @@ spec:
       name: {{ .name }}
       targetPort: {{ .targetPort }}
 {{- end }}
-{{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.nodePort))) }}
+{{- if (and (eq $svcType "NodePort") (not (empty .Values.service.nodePort))) }}
       nodePort: {{ .Values.service.nodePort }}
 {{- end }}
 {{- if .Values.extraPorts }}
