@@ -25,8 +25,9 @@ func New(textChatHandler *handlers.TextChatHandler) *mux.Router {
 	getRouter.HandleFunc("/messages/conversation/{id:[0-9a-z-]+}", textChatHandler.GetMessagesByConversationID)
 
 	//Health Check
-	getRouter.HandleFunc("/health/live", textChatHandler.LivenessCheck)
-	getRouter.HandleFunc("/health/ready", textChatHandler.ReadinessCheck)
+	healthRouter := router.Methods(http.MethodGet).Subrouter()
+	healthRouter.HandleFunc("/health/live", textChatHandler.LivenessCheck)
+	healthRouter.HandleFunc("/health/ready", textChatHandler.ReadinessCheck)
 
 	// Message post router
 	messagePostRouter := router.Methods(http.MethodPost).Subrouter()
