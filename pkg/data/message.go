@@ -16,8 +16,8 @@ type Message struct {
 	UserID         string `json:"user_id" validate:"required"`
 	ConversationID string `json:"conversation_id" bson:"conversation_id" validate:"required"`
 	Text           string `json:"text" validate:"required"`
-	CreatedOn      string `json:"-"`
-	UpdatedOn      string `json:"-"`
+	CreatedOn      string `json:"created_on"`
+	UpdatedOn      string `json:"updated_on"`
 }
 
 // Messages is a collection of Message
