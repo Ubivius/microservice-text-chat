@@ -30,7 +30,7 @@ func main() {
 	tp := tracing.CreateTracerProvider(os.Getenv("JAEGER_ENDPOINT"), "microservice-text-chat-traces")
 
 	// Starting metrics exporter
-	metrics.StartPrometheusExporterWithName("text-chat")
+	metrics.StartPrometheusExporterWithName("text_chat")
 
 	// Database init
 	db := database.NewMongoTextChat()
